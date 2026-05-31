@@ -1,0 +1,795 @@
+.video {
+  width: 360px;
+  height: 640px;
+  margin: 40px auto;
+
+  overflow: hidden;
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  transition: all 0.5s ease;
+}
+
+/* 场景转场 */
+.scene-transition {
+  animation: sceneTransition 0.55s ease forwards;
+}
+
+@keyframes sceneTransition {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+    filter: blur(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+/* 摄像机呼吸感 */
+.video::after {
+  content: "";
+  position: absolute;
+  inset: -20px;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.03),
+      transparent 70%
+    );
+
+  animation: cameraBreath 6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes cameraBreath {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.08);
+  }
+}
+
+/* 漂浮光效 */
+.video::before {
+  content: "";
+  position: absolute;
+
+  width: 420px;
+  height: 420px;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.12),
+      transparent 70%
+    );
+
+  top: -120px;
+  left: -120px;
+
+  animation: floatingGlow 8s ease-in-out infinite alternate;
+
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+@keyframes floatingGlow {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+
+  50% {
+    transform: translate(60px, 40px) scale(1.2);
+  }
+
+  100% {
+    transform: translate(-20px, 80px) scale(0.9);
+  }
+}
+
+/* 通用高亮 */
+.highlight {
+  color: #ff3b5c;
+
+  text-shadow:
+    0 0 12px rgba(255, 60, 100, 0.8),
+    0 0 24px rgba(255, 60, 100, 0.5);
+}
+
+/* Hook Scene */
+.hook-scene {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+}
+
+.hook-text {
+  font-size: 42px;
+
+  font-weight: 900;
+
+  line-height: 1.15;
+
+  text-align: center;
+
+  color: white;
+
+  max-width: 85%;
+
+  margin: 0 auto;
+
+  word-break: keep-all;
+}
+
+@keyframes cinematicEnter {
+  0% {
+    opacity: 0;
+    transform: scale(1.4) translateY(80px);
+    filter: blur(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* HookScene 内部光斑 */
+.glow {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+
+  border-radius: 999px;
+  filter: blur(50px);
+  opacity: 0.5;
+
+  animation: floatGlow 4s ease-in-out infinite alternate;
+}
+
+.glow-one {
+  background: rgba(255, 59, 92, 0.45);
+  top: 80px;
+  left: -60px;
+}
+
+.glow-two {
+  background: rgba(110, 80, 255, 0.45);
+  bottom: 90px;
+  right: -70px;
+
+  animation-delay: 1s;
+}
+
+@keyframes floatGlow {
+  from {
+    transform: scale(1) translateY(0);
+  }
+
+  to {
+    transform: scale(1.25) translateY(30px);
+  }
+}
+
+/* Problem Scene */
+.problem-scene {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding: 32px;
+  position: relative;
+  z-index: 2;
+}
+
+.problem-label {
+  align-self: flex-start;
+
+  font-size: 16px;
+  font-weight: 900;
+
+  color: #ff3b5c;
+  border: 1px solid rgba(255, 59, 92, 0.5);
+
+  padding: 6px 12px;
+  border-radius: 999px;
+
+  margin-bottom: 24px;
+}
+
+.problem-text {
+  width: 100%;
+
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1.4;
+
+  color: white;
+  text-align: left;
+
+  word-break: break-word;
+
+  text-shadow:
+    0 0 16px rgba(255, 59, 92, 0.4),
+    0 0 32px rgba(255, 59, 92, 0.2);
+}
+
+/* Value Scene */
+.value-scene {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding: 32px;
+  position: relative;
+  z-index: 2;
+}
+
+.value-label {
+  font-size: 16px;
+  font-weight: 900;
+
+  color: #8bffcb;
+  border: 1px solid rgba(139, 255, 203, 0.5);
+
+  padding: 6px 12px;
+  border-radius: 999px;
+
+  width: fit-content;
+  margin-bottom: 24px;
+}
+
+.value-text {
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1.35;
+
+  color: white;
+  text-align: left;
+
+  text-shadow:
+    0 0 16px rgba(139, 255, 203, 0.35),
+    0 0 32px rgba(139, 255, 203, 0.15);
+}
+
+.value-line {
+  width: 80px;
+  height: 4px;
+
+  margin-top: 24px;
+
+  background: #8bffcb;
+  border-radius: 999px;
+
+  box-shadow:
+    0 0 12px rgba(139, 255, 203, 0.8),
+    0 0 28px rgba(139, 255, 203, 0.4);
+}
+
+/* 通用动画 */
+.pop {
+  animation: popIn 0.5s ease forwards;
+}
+
+.slide {
+  animation: slideIn 0.5s ease forwards;
+}
+
+.zoom {
+  animation: zoomIn 0.5s ease forwards;
+}
+
+.shake {
+  animation: shakeIn 0.5s ease forwards;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-80px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shakeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateX(10px);
+  }
+
+  60% {
+    transform: translateX(-6px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+.debug-panel {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+
+  z-index: 20;
+
+  font-size: 11px;
+  line-height: 1.5;
+
+  color: rgba(255, 255, 255, 0.65);
+
+  background: rgba(0, 0, 0, 0.35);
+  padding: 8px 10px;
+  border-radius: 10px;
+
+  backdrop-filter: blur(8px);
+}
+.progress-bar {
+  position: absolute;
+  bottom: 18px;
+  left: 24px;
+  right: 24px;
+
+  height: 4px;
+
+  z-index: 30;
+
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+
+  background: linear-gradient(90deg, #ff3b5c, #8bffcb);
+  border-radius: 999px;
+
+  box-shadow:
+    0 0 12px rgba(255, 59, 92, 0.8),
+    0 0 24px rgba(139, 255, 203, 0.5);
+
+  transition: width 0.08s linear;
+}
+.timeline-panel {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  z-index: 20;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.timeline-item {
+  font-size: 11px;
+  font-weight: 800;
+
+  color: rgba(255, 255, 255, 0.45);
+
+  background: rgba(0, 0, 0, 0.28);
+  padding: 5px 8px;
+  border-radius: 8px;
+
+  backdrop-filter: blur(8px);
+}
+
+.timeline-item.active {
+  color: white;
+
+  background: rgba(255, 59, 92, 0.75);
+
+  box-shadow:
+    0 0 12px rgba(255, 59, 92, 0.6),
+    0 0 24px rgba(255, 59, 92, 0.35);
+}
+.play-button {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  z-index: 40;
+
+  border: none;
+  border-radius: 999px;
+
+  padding: 8px 18px;
+
+  font-size: 12px;
+  font-weight: 900;
+
+  color: white;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  backdrop-filter: blur(10px);
+
+  cursor: pointer;
+
+  box-shadow:
+    0 0 12px rgba(255, 59, 92, 0.45),
+    0 0 24px rgba(139, 255, 203, 0.22);
+}
+
+.play-button:hover {
+  background: rgba(255, 59, 92, 0.65);
+}
+.shortcut-panel {
+  position: absolute;
+
+  left: 12px;
+  bottom: 12px;
+
+  z-index: 40;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  padding: 10px 12px;
+
+  border-radius: 12px;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  color: rgba(255,255,255,0.7);
+
+  background: rgba(0,0,0,0.35);
+
+  backdrop-filter: blur(10px);
+}
+.timeline-item {
+  border: none;
+  cursor: pointer;
+}
+
+.timeline-item:hover {
+  transform: scale(1.05);
+}
+.global-progress-bar {
+  position: absolute;
+  bottom: 8px;
+  left: 24px;
+  right: 24px;
+
+  height: 3px;
+
+  z-index: 30;
+
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+
+  overflow: hidden;
+}
+
+.global-progress-fill {
+  height: 100%;
+  width: 0%;
+
+  background: linear-gradient(90deg, #ffffff, #ff3b5c);
+  border-radius: 999px;
+
+  transition: width 0.08s linear;
+}
+.global-progress-bar {
+  cursor: pointer;
+}
+
+.global-progress-bar:hover {
+  height: 5px;
+}
+
+.scene-camera {
+  width: 100%;
+  height: 100%;
+
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  transform-origin: center center;
+
+  will-change: transform;
+}
+/* ========================= */
+/* Depth System */
+/* ========================= */
+
+.depth-back {
+  position: absolute;
+  inset: 0;
+
+  z-index: 1;
+
+  pointer-events: none;
+}
+
+.depth-middle {
+  position: relative;
+
+  z-index: 5;
+}
+
+.depth-front {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 20;
+
+  pointer-events: none;
+}
+/* ========================= */
+/* Ambient Light */
+/* ========================= */
+
+.ambient-glow {
+  position: absolute;
+
+  width: 500px;
+  height: 500px;
+
+  top: 50%;
+  left: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255,80,120,0.15),
+      transparent 70%
+    );
+
+  filter: blur(80px);
+
+  animation:
+    ambientFloat 8s ease-in-out infinite alternate;
+}
+
+@keyframes ambientFloat {
+  from {
+    transform:
+      translate(-50%, -50%)
+      scale(1);
+  }
+
+  to {
+    transform:
+      translate(-50%, -50%)
+      scale(1.2);
+  }
+}
+
+/* ========================= */
+/* Film Grain */
+/* ========================= */
+
+.film-grain {
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    radial-gradient(
+      rgba(255,255,255,0.03) 1px,
+      transparent 1px
+    );
+
+  background-size: 4px 4px;
+
+  opacity: 0.3;
+}
+.contrast-scene {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+}
+
+.contrast-column {
+  width: 130px;
+  min-height: 150px;
+
+  padding: 16px 12px;
+
+  border-radius: 18px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(14px);
+
+  box-shadow:
+    0 0 20px rgba(255, 59, 92, 0.22),
+    inset 0 0 20px rgba(255, 255, 255, 0.04);
+}
+
+.contrast-column.before {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.contrast-column.after {
+  border: 1px solid rgba(255, 59, 92, 0.65);
+
+  box-shadow:
+    0 0 24px rgba(255, 59, 92, 0.45),
+    inset 0 0 20px rgba(255, 59, 92, 0.08);
+}
+
+.contrast-label {
+  font-size: 11px;
+  font-weight: 900;
+
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.contrast-title {
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1.1;
+
+  color: white;
+}
+
+.contrast-column.after .contrast-title {
+  color: #ff3b5c;
+
+  text-shadow:
+    0 0 12px rgba(255, 59, 92, 0.8),
+    0 0 24px rgba(255, 59, 92, 0.4);
+}
+
+.contrast-desc {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.5;
+
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.contrast-vs {
+  font-size: 18px;
+  font-weight: 900;
+
+  color: rgba(255, 255, 255, 0.45);
+
+  text-shadow:
+    0 0 12px rgba(255, 255, 255, 0.25);
+}
+.hook-wrapper {
+  width: 100%;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  padding: 0 20px;
+}
+
+.hook-final {
+  width: 100%;
+  height: 100%;
+
+  position: relative;
+  z-index: 5;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  text-align: center;
+}
+
+.hook-final-ai {
+  font-size: 76px;
+  font-weight: 1000;
+  line-height: 0.9;
+
+  color: #ff3b5c;
+
+  text-shadow:
+    0 0 20px rgba(255, 59, 92, 0.95),
+    0 0 48px rgba(255, 59, 92, 0.55);
+}
+
+.hook-final-action {
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1;
+
+  color: white;
+
+  white-space: nowrap;
+}
+
+.hook-final-object {
+  font-size: 46px;
+  font-weight: 1000;
+  line-height: 1;
+
+  color: white;
+
+  white-space: nowrap;
+}
