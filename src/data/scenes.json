@@ -1,0 +1,78 @@
+[
+  {
+    "scene": "hook",
+    "start": 0,
+    "duration": 1200,
+    "text": "AI正在改变视频行业",
+    "highlight": "AI",
+    "background": "linear-gradient(135deg, #111, #2b2b2b)",
+    "position": "center",
+    "animation": "pop",
+    "camera": {
+      "scaleFrom": 1,
+      "scaleTo": 1.04,
+      "xFrom": -8,
+      "xTo": 0,
+      "yFrom": 8,
+      "yTo": 0,
+      "shake": 0.4
+    }
+  },
+  {
+    "scene": "problem",
+    "start": 1200,
+    "duration": 1500,
+    "text": "未来的视频将由AI生成",
+    "highlight": "AI",
+    "background": "linear-gradient(135deg, #111, #1b263b)",
+    "position": "top",
+    "animation": "slide",
+    "camera": {
+      "scaleFrom": 1,
+      "scaleTo": 1.05,
+      "xFrom": 10,
+      "xTo": 0,
+      "yFrom": 12,
+      "yTo": 0,
+      "shake": 0.6
+    }
+  },
+  {
+    "scene": "value",
+    "start": 2700,
+    "duration": 1500,
+    "text": "程序化视频是未来",
+    "highlight": "程序化视频",
+    "background": "linear-gradient(135deg, #111, #2d1b3d)",
+    "position": "center",
+    "animation": "zoom",
+    "camera": {
+      "scaleFrom": 1,
+      "scaleTo": 1.06,
+      "xFrom": -12,
+      "xTo": 0,
+      "yFrom": 10,
+      "yTo": 0,
+      "shake": 0.5
+    }
+  },
+  {
+    "scene": "contrast",
+    "start": 4200,
+    "duration": 1200,
+    "text": "传统剪辑正在被重构",
+    "highlight": "传统剪辑",
+    "background": "linear-gradient(135deg, #111, #3a1f1f)",
+    "position": "bottom",
+    "animation": "shake",
+    "camera": {
+      "scaleFrom": 1,
+      "scaleTo": 1.04,
+      "xFrom": 8,
+      "xTo": 0,
+      "yFrom": -6,
+      "yTo": 0,
+      "shake": 0.8
+    }
+  }
+]
