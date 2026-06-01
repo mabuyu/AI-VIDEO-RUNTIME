@@ -1,7 +1,16 @@
-import type { RuntimeScene } from './sceneParser'
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
 
-export function validateScene(scene: RuntimeScene) {
+export function validateScene(scene: unknown) {
   const errors: string[] = []
+
+  if (!isRecord(scene)) {
+    return {
+      valid: false,
+      errors: ['scene must be object'],
+    }
+  }
 
   if (!scene.scene) errors.push('scene is required')
   if (typeof scene.start !== 'number') errors.push('start must be number')
@@ -12,7 +21,7 @@ export function validateScene(scene: RuntimeScene) {
   if (!scene.position) errors.push('position is required')
   if (!scene.animation) errors.push('animation is required')
 
-  if (!scene.camera) {
+  if (!isRecord(scene.camera)) {
     errors.push('camera is required')
   } else {
     if (typeof scene.camera.scaleFrom !== 'number') {
@@ -50,11 +59,15 @@ export function validateScene(scene: RuntimeScene) {
   }
 }
 
-export function validateScenes(scenes: RuntimeScene[]) {
+export function validateScenes(scenes: unknown[]) {
   return scenes.map((scene, index) => {
+    const sceneName = isRecord(scene) && typeof scene.scene === 'string'
+      ? scene.scene
+      : 'unknown'
+
     return {
       index,
-      scene: scene.scene,
+      scene: sceneName,
       ...validateScene(scene),
     }
   })

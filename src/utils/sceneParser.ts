@@ -1,4 +1,5 @@
 import scenesData from '../data/scenes.json'
+import { validateScenes } from './sceneValidator'
 
 export interface SceneCamera {
   scaleFrom: number
@@ -22,7 +23,24 @@ export interface RuntimeScene {
   camera: SceneCamera
 }
 
-export const scenes = scenesData as RuntimeScene[]
+function parseScenes() {
+  const validationResults = validateScenes(scenesData)
+  const invalidScenes = validationResults.filter((result) => !result.valid)
+
+  if (invalidScenes.length > 0) {
+    const message = invalidScenes
+      .map((result) => {
+        return `Scene ${result.index} (${result.scene}): ${result.errors.join(', ')}`
+      })
+      .join('\n')
+
+    throw new Error(`Scene JSON validation failed:\n${message}`)
+  }
+
+  return scenesData as RuntimeScene[]
+}
+
+export const scenes = parseScenes()
 
 export function getScenes() {
   return scenes
