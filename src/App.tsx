@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import DepthLayer from './components/DepthLayer'
 import SceneStatus from './components/SceneStatus'
 import SceneTransition from './components/SceneTransition'
+import Subtitle from './components/Subtitle'
 import './App.css'
 
 import { cameraShake } from './utils/camera'
@@ -13,22 +14,36 @@ import {
   getGlobalProgress,
   getSceneProgress,
   getScenes,
-  getTotalDuration,
 } from './utils/sceneParser'
 import { renderSceneByType } from './utils/sceneRenderer'
 import { easeOutCubic, interpolate } from './utils/motion'
-import { getEnterStyle, getExitStyle, getTransitionProgress } from './utils/transition'
+import {
+  getEnterStyle,
+  getExitStyle,
+  getTransitionProgress,
+} from './utils/transition'
+import {
+  getTimelineDuration,
+  getTimelineFPS,
+} from './utils/timelineParser'
+import { validateTimeline } from './utils/timelineValidator'
+import { validateSubtitles } from './utils/subtitleValidator'
+import { getCurrentSubtitle } from './utils/subtitleParser'
 
 function App() {
-  const FPS = 30
+  const FPS = getTimelineFPS()
 
-  // 从 sceneParser 获取 Runtime Scene 数据
   const scenes = getScenes()
-  const totalDuration = getTotalDuration()
+  const totalDuration = getTimelineDuration()
   const totalFrames = Math.floor((totalDuration / 1000) * FPS)
 
   const [frame, setFrame] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
+
+  useEffect(() => {
+    console.log('Timeline Validation:', validateTimeline())
+    console.log('Subtitle Validation:', validateSubtitles())
+  }, [])
 
   useEffect(() => {
     if (!isPlaying) return
@@ -41,7 +56,7 @@ function App() {
     }, 1000 / FPS)
 
     return () => clearInterval(timer)
-  }, [totalFrames, isPlaying])
+  }, [FPS, totalFrames, isPlaying])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -49,8 +64,15 @@ function App() {
         event.preventDefault()
         setIsPlaying((prev) => !prev)
       }
-      if (event.code === 'ArrowLeft') setFrame((prev) => Math.max(prev - 1, 0))
-      if (event.code === 'ArrowRight') setFrame((prev) => Math.min(prev + 1, totalFrames - 1))
+
+      if (event.code === 'ArrowLeft') {
+        setFrame((prev) => Math.max(prev - 1, 0))
+      }
+
+      if (event.code === 'ArrowRight') {
+        setFrame((prev) => Math.min(prev + 1, totalFrames - 1))
+      }
+
       if (event.code === 'KeyR') {
         setFrame(0)
         setIsPlaying(false)
@@ -58,10 +80,15 @@ function App() {
     }
 
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
   }, [totalFrames])
 
   const currentTime = (frame / FPS) * 1000
+  const currentSubtitle = getCurrentSubtitle(currentTime)
+
   const currentScene = getCurrentScene(currentTime)
   const currentIndex = getCurrentSceneIndex(currentTime)
   const sceneProgress = getSceneProgress(currentTime, currentScene)
@@ -75,16 +102,19 @@ function App() {
     currentScene.camera.scaleFrom,
     currentScene.camera.scaleTo
   )
+
   const baseCameraX = interpolate(
     easedSceneProgress,
     currentScene.camera.xFrom,
     currentScene.camera.xTo
   )
+
   const baseCameraY = interpolate(
     easedSceneProgress,
     currentScene.camera.yFrom,
     currentScene.camera.yTo
   )
+
   const shake = cameraShake(currentTime, currentScene.camera.shake)
   const cameraX = baseCameraX + shake.x
   const cameraY = baseCameraY + shake.y
@@ -100,7 +130,8 @@ function App() {
     const clickX = event.clientX - rect.left
     const ratio = clickX / rect.width
     const targetTime = totalDuration * ratio
-    setFrame(Math.floor(targetTime / 1000 * FPS))
+
+    setFrame(Math.floor((targetTime / 1000) * FPS))
     setIsPlaying(false)
   }
 
@@ -138,6 +169,7 @@ function App() {
         <div>camera y: {cameraY.toFixed(1)}</div>
         <div>shake x: {shake.x.toFixed(2)}</div>
         <div>shake y: {shake.y.toFixed(2)}</div>
+        <div>subtitle: {currentSubtitle?.text || 'none'}</div>
         <div>status: {isPlaying ? 'playing' : 'paused'}</div>
       </div>
 
@@ -145,7 +177,9 @@ function App() {
         {scenes.map((scene, index) => (
           <button
             key={scene.scene}
-            className={index === currentIndex ? 'timeline-item active' : 'timeline-item'}
+            className={
+              index === currentIndex ? 'timeline-item active' : 'timeline-item'
+            }
             onClick={() => jumpToScene(scene.start)}
           >
             {scene.scene}
@@ -154,11 +188,17 @@ function App() {
       </div>
 
       <div className="progress-bar">
-        <div className="progress-fill" style={{ width: `${sceneProgress * 100}%` }}></div>
+        <div
+          className="progress-fill"
+          style={{ width: `${sceneProgress * 100}%` }}
+        ></div>
       </div>
 
       <div className="global-progress-bar" onClick={seekGlobalTimeline}>
-        <div className="global-progress-fill" style={{ width: `${globalProgress * 100}%` }}></div>
+        <div
+          className="global-progress-fill"
+          style={{ width: `${globalProgress * 100}%` }}
+        ></div>
       </div>
 
       <button className="play-button" onClick={() => setIsPlaying(!isPlaying)}>
@@ -173,7 +213,12 @@ function App() {
         <div>Click Bar : Seek</div>
       </div>
 
-      <DepthLayer className="scene-camera depth-middle" x={cameraX} y={cameraY} scale={cameraScale}>
+      <DepthLayer
+        className="scene-camera depth-middle"
+        x={cameraX}
+        y={cameraY}
+        scale={cameraScale}
+      >
         <SceneStatus
           scene={currentScene.scene}
           state={sceneState}
@@ -184,8 +229,18 @@ function App() {
           frame={frame}
           time={currentTime}
         />
-        <div style={{ ...getExitStyle(transitionProgress), ...getEnterStyle(sceneProgress) }}>
-          <SceneTransition progress={sceneProgress}>{renderCurrentScene()}</SceneTransition>
+
+        <Subtitle subtitle={currentSubtitle} />
+
+        <div
+          style={{
+            ...getExitStyle(transitionProgress),
+            ...getEnterStyle(sceneProgress),
+          }}
+        >
+          <SceneTransition progress={sceneProgress}>
+            {renderCurrentScene()}
+          </SceneTransition>
         </div>
       </DepthLayer>
 

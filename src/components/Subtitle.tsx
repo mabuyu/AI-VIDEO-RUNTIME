@@ -1,22 +1,34 @@
-type SubtitleProps = {
+interface SubtitleData {
+  id: string
+  start: number
+  duration: number
   text: string
-  highlight: string
-  animation: string
 }
 
-function Subtitle(props: SubtitleProps) {
+interface SubtitleProps {
+  subtitle?: SubtitleData
+}
 
-  const parts = props.text.split(props.highlight)
+export default function Subtitle({ subtitle }: SubtitleProps) {
+  if (!subtitle) return null
 
   return (
-    <div className={`subtitle ${props.animation}`}>
-      {parts[0]}
-      <span className="highlight">
-        {props.highlight}
-      </span>
-      {parts[1]}
+    <div
+      style={{
+        position: 'absolute',
+        bottom: 80,
+        left: 0,
+        right: 0,
+        textAlign: 'center',
+        color: '#ffffff',
+        fontSize: 20,
+        fontWeight: 700,
+        textShadow: '0 0 12px rgba(0, 0, 0, 0.8)',
+        zIndex: 30,
+        pointerEvents: 'none',
+      }}
+    >
+      {subtitle.text}
     </div>
   )
 }
-
-export default Subtitle
