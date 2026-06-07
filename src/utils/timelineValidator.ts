@@ -16,12 +16,11 @@ export function validateTimeline() {
     errors.push('tracks missing')
   }
 
-  if (
-    Array.isArray(timeline.tracks) &&
-    timeline.tracks.length === 0
-  ) {
+  if (Array.isArray(timeline.tracks) && timeline.tracks.length === 0) {
     errors.push('tracks empty')
   }
+
+  const validTypes = ['scene', 'subtitle', 'camera']
 
   timeline.tracks.forEach((track, index) => {
     if (!track.id) {
@@ -30,6 +29,10 @@ export function validateTimeline() {
 
     if (!track.type) {
       errors.push(`track ${index}: type missing`)
+    }
+
+    if (!validTypes.includes(track.type)) {
+      errors.push(`track ${track.id}: invalid type`)
     }
 
     if (!track.source) {

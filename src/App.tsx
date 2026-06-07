@@ -16,7 +16,7 @@ import {
   getScenes,
 } from './utils/sceneParser'
 import { renderSceneByType } from './utils/sceneRenderer'
-import { easeOutCubic, interpolate } from './utils/motion'
+import { interpolate } from './utils/motion'
 import {
   getEnterStyle,
   getExitStyle,
@@ -26,6 +26,8 @@ import {
   getTimelineDuration,
   getTimelineFPS,
 } from './utils/timelineParser'
+import { getCurrentCamera } from './utils/cameraParser'
+import { validateCamera } from './utils/cameraValidator'
 import { validateTimeline } from './utils/timelineValidator'
 import { validateSubtitles } from './utils/subtitleValidator'
 import { getCurrentSubtitle } from './utils/subtitleParser'
@@ -43,6 +45,7 @@ function App() {
   useEffect(() => {
     console.log('Timeline Validation:', validateTimeline())
     console.log('Subtitle Validation:', validateSubtitles())
+    console.log('Camera Validation:', validateCamera())
   }, [])
 
   useEffect(() => {
@@ -88,6 +91,17 @@ function App() {
 
   const currentTime = (frame / FPS) * 1000
   const currentSubtitle = getCurrentSubtitle(currentTime)
+  const currentCamera = getCurrentCamera(currentTime)
+
+  const cameraProgress = currentCamera
+    ? Math.min(
+        Math.max(
+          (currentTime - currentCamera.start) / currentCamera.duration,
+          0
+        ),
+        1
+      )
+    : 0
 
   const currentScene = getCurrentScene(currentTime)
   const currentIndex = getCurrentSceneIndex(currentTime)
@@ -95,27 +109,32 @@ function App() {
   const sceneState = getSceneState(sceneProgress)
   const globalProgress = getGlobalProgress(currentTime)
   const transitionProgress = getTransitionProgress(sceneProgress, 0.8, 1)
-  const easedSceneProgress = easeOutCubic(sceneProgress)
 
-  const cameraScale = interpolate(
-    easedSceneProgress,
-    currentScene.camera.scaleFrom,
-    currentScene.camera.scaleTo
-  )
+  const cameraScale = currentCamera
+    ? interpolate(
+        cameraProgress,
+        currentCamera.scaleFrom,
+        currentCamera.scaleTo
+      )
+    : 1
 
-  const baseCameraX = interpolate(
-    easedSceneProgress,
-    currentScene.camera.xFrom,
-    currentScene.camera.xTo
-  )
+  const baseCameraX = currentCamera
+    ? interpolate(
+        cameraProgress,
+        currentCamera.xFrom,
+        currentCamera.xTo
+      )
+    : 0
 
-  const baseCameraY = interpolate(
-    easedSceneProgress,
-    currentScene.camera.yFrom,
-    currentScene.camera.yTo
-  )
+  const baseCameraY = currentCamera
+    ? interpolate(
+        cameraProgress,
+        currentCamera.yFrom,
+        currentCamera.yTo
+      )
+    : 0
 
-  const shake = cameraShake(currentTime, currentScene.camera.shake)
+  const shake = cameraShake(currentTime, currentCamera?.shake ?? 0)
   const cameraX = baseCameraX + shake.x
   const cameraY = baseCameraY + shake.y
 
@@ -167,6 +186,9 @@ function App() {
         <div>camera scale: {cameraScale.toFixed(2)}</div>
         <div>camera x: {cameraX.toFixed(1)}</div>
         <div>camera y: {cameraY.toFixed(1)}</div>
+        <div>camera active: {currentCamera ? 'yes' : 'no'}</div>
+        <div>camera preset: {currentCamera?.preset ?? 'none'}</div>
+        <div>camera progress: {cameraProgress.toFixed(2)}</div>
         <div>shake x: {shake.x.toFixed(2)}</div>
         <div>shake y: {shake.y.toFixed(2)}</div>
         <div>subtitle: {currentSubtitle?.text || 'none'}</div>
