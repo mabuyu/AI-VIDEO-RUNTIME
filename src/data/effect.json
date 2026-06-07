@@ -1,0 +1,26 @@
+[
+  {
+    "id": "effect-hook",
+    "start": 0,
+    "duration": 1200,
+    "preset": "cinematic"
+  },
+  {
+    "id": "effect-problem",
+    "start": 1200,
+    "duration": 1500,
+    "preset": "dramatic"
+  },
+  {
+    "id": "effect-value",
+    "start": 2700,
+    "duration": 1500,
+    "preset": "clean"
+  },
+  {
+    "id": "effect-contrast",
+    "start": 4200,
+    "duration": 1300,
+    "preset": "dream"
+  }
+]

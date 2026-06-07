@@ -31,6 +31,12 @@ import { validateCamera } from './utils/cameraValidator'
 import { validateTimeline } from './utils/timelineValidator'
 import { validateSubtitles } from './utils/subtitleValidator'
 import { getCurrentSubtitle } from './utils/subtitleParser'
+import {
+  getCurrentEffect,
+  getEffectProgress,
+} from './utils/effectParser'
+import { getEffectPreset } from './utils/effectPresets'
+import { validateEffects } from './utils/effectValidator'
 
 function App() {
   const FPS = getTimelineFPS()
@@ -46,6 +52,7 @@ function App() {
     console.log('Timeline Validation:', validateTimeline())
     console.log('Subtitle Validation:', validateSubtitles())
     console.log('Camera Validation:', validateCamera())
+    console.log('Effect Validation:', validateEffects())
   }, [])
 
   useEffect(() => {
@@ -92,6 +99,11 @@ function App() {
   const currentTime = (frame / FPS) * 1000
   const currentSubtitle = getCurrentSubtitle(currentTime)
   const currentCamera = getCurrentCamera(currentTime)
+  const currentEffect = getCurrentEffect(currentTime)
+  const effectProgress = getEffectProgress(currentTime, currentEffect)
+  const effectPreset = currentEffect
+    ? getEffectPreset(currentEffect.preset)
+    : null
 
   const cameraProgress = currentCamera
     ? Math.min(
@@ -119,24 +131,23 @@ function App() {
     : 1
 
   const baseCameraX = currentCamera
-    ? interpolate(
-        cameraProgress,
-        currentCamera.xFrom,
-        currentCamera.xTo
-      )
+    ? interpolate(cameraProgress, currentCamera.xFrom, currentCamera.xTo)
     : 0
 
   const baseCameraY = currentCamera
-    ? interpolate(
-        cameraProgress,
-        currentCamera.yFrom,
-        currentCamera.yTo
-      )
+    ? interpolate(cameraProgress, currentCamera.yFrom, currentCamera.yTo)
     : 0
 
   const shake = cameraShake(currentTime, currentCamera?.shake ?? 0)
   const cameraX = baseCameraX + shake.x
   const cameraY = baseCameraY + shake.y
+
+  const effectFilter = `
+    blur(${effectPreset?.blur ?? 0}px)
+    brightness(${effectPreset?.brightness ?? 1})
+    contrast(${effectPreset?.contrast ?? 1})
+    saturate(${effectPreset?.saturation ?? 1})
+  `
 
   const jumpToScene = (sceneStart: number) => {
     const targetFrame = Math.floor((sceneStart / 1000) * FPS)
@@ -183,6 +194,7 @@ function App() {
         <div>scene state: {sceneState}</div>
         <div>transition progress: {transitionProgress.toFixed(2)}</div>
         <div>global progress: {globalProgress.toFixed(2)}</div>
+
         <div>camera scale: {cameraScale.toFixed(2)}</div>
         <div>camera x: {cameraX.toFixed(1)}</div>
         <div>camera y: {cameraY.toFixed(1)}</div>
@@ -191,6 +203,20 @@ function App() {
         <div>camera progress: {cameraProgress.toFixed(2)}</div>
         <div>shake x: {shake.x.toFixed(2)}</div>
         <div>shake y: {shake.y.toFixed(2)}</div>
+
+        <div>effect preset: {currentEffect?.preset ?? 'none'}</div>
+        <div>effect progress: {effectProgress.toFixed(2)}</div>
+
+        <div>blur: {effectPreset?.blur ?? 0}</div>
+        <div>glow: {effectPreset?.glow ?? 0}</div>
+        <div>noise: {effectPreset?.noise ?? 0}</div>
+        <div>vignette: {effectPreset?.vignette ?? 0}</div>
+        <div>bloom: {effectPreset?.bloom ?? 0}</div>
+
+<div>brightness: {effectPreset?.brightness ?? 1}</div>
+<div>contrast: {effectPreset?.contrast ?? 1}</div>
+<div>saturation: {effectPreset?.saturation ?? 1}</div>
+
         <div>subtitle: {currentSubtitle?.text || 'none'}</div>
         <div>status: {isPlaying ? 'playing' : 'paused'}</div>
       </div>
@@ -241,28 +267,30 @@ function App() {
         y={cameraY}
         scale={cameraScale}
       >
-        <SceneStatus
-          scene={currentScene.scene}
-          state={sceneState}
-          index={currentIndex}
-          sceneProgress={sceneProgress}
-          globalProgress={globalProgress}
-          transitionProgress={transitionProgress}
-          frame={frame}
-          time={currentTime}
-        />
+        <div style={{ filter: effectFilter }}>
+          <SceneStatus
+            scene={currentScene.scene}
+            state={sceneState}
+            index={currentIndex}
+            sceneProgress={sceneProgress}
+            globalProgress={globalProgress}
+            transitionProgress={transitionProgress}
+            frame={frame}
+            time={currentTime}
+          />
 
-        <Subtitle subtitle={currentSubtitle} />
+          <Subtitle subtitle={currentSubtitle} />
 
-        <div
-          style={{
-            ...getExitStyle(transitionProgress),
-            ...getEnterStyle(sceneProgress),
-          }}
-        >
-          <SceneTransition progress={sceneProgress}>
-            {renderCurrentScene()}
-          </SceneTransition>
+          <div
+            style={{
+              ...getExitStyle(transitionProgress),
+              ...getEnterStyle(sceneProgress),
+            }}
+          >
+            <SceneTransition progress={sceneProgress}>
+              {renderCurrentScene()}
+            </SceneTransition>
+          </div>
         </div>
       </DepthLayer>
 
