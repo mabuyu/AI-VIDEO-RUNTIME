@@ -1,0 +1,26 @@
+[
+  {
+    "id": "audio-hook",
+    "start": 0,
+    "duration": 1200,
+    "preset": "impact"
+  },
+  {
+    "id": "audio-problem",
+    "start": 1200,
+    "duration": 1500,
+    "preset": "dramatic"
+  },
+  {
+    "id": "audio-value",
+    "start": 2700,
+    "duration": 1500,
+    "preset": "clean"
+  },
+  {
+    "id": "audio-contrast",
+    "start": 4200,
+    "duration": 1300,
+    "preset": "cinematic"
+  }
+]

@@ -37,6 +37,11 @@ import {
 } from './utils/effectParser'
 import { getEffectPreset } from './utils/effectPresets'
 import { validateEffects } from './utils/effectValidator'
+import {
+  getCurrentAudio,
+  getAudioProgress,
+} from './utils/audioParser'
+import { getAudioPreset } from './utils/audioPresets'
 
 function App() {
   const FPS = getTimelineFPS()
@@ -100,10 +105,34 @@ function App() {
   const currentSubtitle = getCurrentSubtitle(currentTime)
   const currentCamera = getCurrentCamera(currentTime)
   const currentEffect = getCurrentEffect(currentTime)
+  const currentAudio = getCurrentAudio(currentTime)
+
   const effectProgress = getEffectProgress(currentTime, currentEffect)
   const effectPreset = currentEffect
     ? getEffectPreset(currentEffect.preset)
     : null
+
+  const audioProgress = getAudioProgress(currentTime, currentAudio)
+  const audioPreset = currentAudio
+    ? getAudioPreset(currentAudio.preset)
+    : null
+
+  let audioGain = 1
+
+  if (audioPreset && currentAudio) {
+    audioGain = audioPreset.volume
+
+    if (audioPreset.fadeIn > 0 && audioProgress < audioPreset.fadeIn) {
+      audioGain *= audioProgress / audioPreset.fadeIn
+    }
+
+    if (
+      audioPreset.fadeOut > 0 &&
+      audioProgress > 1 - audioPreset.fadeOut
+    ) {
+      audioGain *= (1 - audioProgress) / audioPreset.fadeOut
+    }
+  }
 
   const cameraProgress = currentCamera
     ? Math.min(
@@ -206,16 +235,21 @@ function App() {
 
         <div>effect preset: {currentEffect?.preset ?? 'none'}</div>
         <div>effect progress: {effectProgress.toFixed(2)}</div>
-
         <div>blur: {effectPreset?.blur ?? 0}</div>
         <div>glow: {effectPreset?.glow ?? 0}</div>
         <div>noise: {effectPreset?.noise ?? 0}</div>
         <div>vignette: {effectPreset?.vignette ?? 0}</div>
         <div>bloom: {effectPreset?.bloom ?? 0}</div>
+        <div>brightness: {effectPreset?.brightness ?? 1}</div>
+        <div>contrast: {effectPreset?.contrast ?? 1}</div>
+        <div>saturation: {effectPreset?.saturation ?? 1}</div>
 
-<div>brightness: {effectPreset?.brightness ?? 1}</div>
-<div>contrast: {effectPreset?.contrast ?? 1}</div>
-<div>saturation: {effectPreset?.saturation ?? 1}</div>
+        <div>audio preset: {currentAudio?.preset ?? 'none'}</div>
+        <div>audio progress: {audioProgress.toFixed(2)}</div>
+        <div>volume: {audioPreset?.volume ?? 0}</div>
+        <div>fadeIn: {audioPreset?.fadeIn ?? 0}</div>
+        <div>fadeOut: {audioPreset?.fadeOut ?? 0}</div>
+        <div>audio gain: {audioGain.toFixed(2)}</div>
 
         <div>subtitle: {currentSubtitle?.text || 'none'}</div>
         <div>status: {isPlaying ? 'playing' : 'paused'}</div>
@@ -260,6 +294,7 @@ function App() {
         <div>Click Scene : Jump</div>
         <div>Click Bar : Seek</div>
       </div>
+      
 
       <DepthLayer
         className="scene-camera depth-middle"
