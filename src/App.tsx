@@ -42,6 +42,16 @@ import {
   getAudioProgress,
 } from './utils/audioParser'
 import { getAudioPreset } from './utils/audioPresets'
+import {
+  getCurrentDepth,
+  getDepthProgress,
+} from './utils/depthParser'
+import { getDepthPreset } from './utils/depthPresets'
+import { validateDepths } from './utils/depthValidator'
+import {
+  getParallaxOffset,
+  getLayerScale,
+} from './utils/parallax'
 
 function App() {
   const FPS = getTimelineFPS()
@@ -58,6 +68,7 @@ function App() {
     console.log('Subtitle Validation:', validateSubtitles())
     console.log('Camera Validation:', validateCamera())
     console.log('Effect Validation:', validateEffects())
+    console.log('Depth Validation:', validateDepths())
   }, [])
 
   useEffect(() => {
@@ -106,6 +117,7 @@ function App() {
   const currentCamera = getCurrentCamera(currentTime)
   const currentEffect = getCurrentEffect(currentTime)
   const currentAudio = getCurrentAudio(currentTime)
+  const currentDepth = getCurrentDepth(currentTime)
 
   const effectProgress = getEffectProgress(currentTime, currentEffect)
   const effectPreset = currentEffect
@@ -117,6 +129,11 @@ function App() {
     ? getAudioPreset(currentAudio.preset)
     : null
 
+  const depthProgress = getDepthProgress(currentTime, currentDepth)
+  const depthPreset = currentDepth
+    ? getDepthPreset(currentDepth.preset)
+    : null
+
   let audioGain = 1
 
   if (audioPreset && currentAudio) {
@@ -126,10 +143,7 @@ function App() {
       audioGain *= audioProgress / audioPreset.fadeIn
     }
 
-    if (
-      audioPreset.fadeOut > 0 &&
-      audioProgress > 1 - audioPreset.fadeOut
-    ) {
+    if (audioPreset.fadeOut > 0 && audioProgress > 1 - audioPreset.fadeOut) {
       audioGain *= (1 - audioProgress) / audioPreset.fadeOut
     }
   }
@@ -171,6 +185,28 @@ function App() {
   const cameraX = baseCameraX + shake.x
   const cameraY = baseCameraY + shake.y
 
+  const backgroundDepth = depthPreset?.background ?? 0.6
+  const middleDepth = depthPreset?.middle ?? 1
+  const foregroundDepth = depthPreset?.foreground ?? 1.4
+
+  const backgroundOffset = getParallaxOffset(
+    cameraX,
+    cameraY,
+    backgroundDepth
+  )
+
+  const middleOffset = getParallaxOffset(cameraX, cameraY, middleDepth)
+
+  const foregroundOffset = getParallaxOffset(
+    cameraX,
+    cameraY,
+    foregroundDepth
+  )
+
+  const backgroundScale = getLayerScale(cameraScale, backgroundDepth)
+  const middleScale = getLayerScale(cameraScale, middleDepth)
+  const foregroundScale = getLayerScale(cameraScale, foregroundDepth)
+
   const effectFilter = `
     blur(${effectPreset?.blur ?? 0}px)
     brightness(${effectPreset?.brightness ?? 1})
@@ -209,8 +245,16 @@ function App() {
       className={`video scene-transition ${currentScene.position}`}
       style={{ background: currentScene.background }}
     >
-      <DepthLayer className="depth-back" x={cameraX * 0.15} y={cameraY * 0.15}>
+      <DepthLayer
+        className="depth-back"
+        x={backgroundOffset.x}
+        y={backgroundOffset.y}
+        scale={backgroundScale}
+      >
         <div className="ambient-glow"></div>
+        <div className="background-grid"></div>
+        <div className="background-orb orb-left"></div>
+        <div className="background-orb orb-right"></div>
       </DepthLayer>
 
       <div className="debug-panel">
@@ -250,6 +294,15 @@ function App() {
         <div>fadeIn: {audioPreset?.fadeIn ?? 0}</div>
         <div>fadeOut: {audioPreset?.fadeOut ?? 0}</div>
         <div>audio gain: {audioGain.toFixed(2)}</div>
+
+        <div>depth preset: {currentDepth?.preset ?? 'none'}</div>
+        <div>depth progress: {depthProgress.toFixed(2)}</div>
+        <div>depth foreground: {foregroundDepth.toFixed(2)}</div>
+        <div>depth middle: {middleDepth.toFixed(2)}</div>
+        <div>depth background: {backgroundDepth.toFixed(2)}</div>
+        <div>foreground scale: {foregroundScale.toFixed(2)}</div>
+        <div>middle scale: {middleScale.toFixed(2)}</div>
+        <div>background scale: {backgroundScale.toFixed(2)}</div>
 
         <div>subtitle: {currentSubtitle?.text || 'none'}</div>
         <div>status: {isPlaying ? 'playing' : 'paused'}</div>
@@ -294,13 +347,12 @@ function App() {
         <div>Click Scene : Jump</div>
         <div>Click Bar : Seek</div>
       </div>
-      
 
       <DepthLayer
         className="scene-camera depth-middle"
-        x={cameraX}
-        y={cameraY}
-        scale={cameraScale}
+        x={middleOffset.x}
+        y={middleOffset.y}
+        scale={middleScale}
       >
         <div style={{ filter: effectFilter }}>
           <SceneStatus
@@ -329,8 +381,15 @@ function App() {
         </div>
       </DepthLayer>
 
-      <DepthLayer className="depth-front" x={cameraX * 1.6} y={cameraY * 1.6}>
+      <DepthLayer
+        className="depth-front"
+        x={foregroundOffset.x}
+        y={foregroundOffset.y}
+        scale={foregroundScale}
+      >
         <div className="film-grain"></div>
+        <div className="foreground-vignette"></div>
+        <div className="foreground-light-streak"></div>
       </DepthLayer>
     </div>
   )

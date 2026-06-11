@@ -1,10 +1,17 @@
 export function getParallaxOffset(
   cameraX: number,
   cameraY: number,
-  depth: number
+  depthFactor: number
 ) {
   return {
-    x: cameraX * depth,
-    y: cameraY * depth,
+    x: cameraX * depthFactor,
+    y: cameraY * depthFactor,
   }
+}
+
+export function getLayerScale(
+  cameraScale: number,
+  depthFactor: number
+) {
+  return 1 + (cameraScale - 1) * depthFactor
 }
