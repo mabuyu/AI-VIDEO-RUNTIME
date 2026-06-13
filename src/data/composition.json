@@ -1,0 +1,26 @@
+[
+  {
+    "id": "composition-hook",
+    "start": 0,
+    "duration": 1200,
+    "preset": "hook"
+  },
+  {
+    "id": "composition-problem",
+    "start": 1200,
+    "duration": 1500,
+    "preset": "problem"
+  },
+  {
+    "id": "composition-value",
+    "start": 2700,
+    "duration": 1500,
+    "preset": "value"
+  },
+  {
+    "id": "composition-contrast",
+    "start": 4200,
+    "duration": 1300,
+    "preset": "contrast"
+  }
+]

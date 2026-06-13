@@ -52,6 +52,12 @@ import {
   getParallaxOffset,
   getLayerScale,
 } from './utils/parallax'
+import {
+  getCurrentComposition,
+  getCompositionProgress,
+} from './utils/compositionParser'
+import { getCompositionPreset } from './utils/compositionPresets'
+import { validateCompositions } from './utils/compositionValidator'
 
 function App() {
   const FPS = getTimelineFPS()
@@ -69,6 +75,7 @@ function App() {
     console.log('Camera Validation:', validateCamera())
     console.log('Effect Validation:', validateEffects())
     console.log('Depth Validation:', validateDepths())
+    console.log('Composition Validation:', validateCompositions())
   }, [])
 
   useEffect(() => {
@@ -118,6 +125,7 @@ function App() {
   const currentEffect = getCurrentEffect(currentTime)
   const currentAudio = getCurrentAudio(currentTime)
   const currentDepth = getCurrentDepth(currentTime)
+  const currentComposition = getCurrentComposition(currentTime)
 
   const effectProgress = getEffectProgress(currentTime, currentEffect)
   const effectPreset = currentEffect
@@ -132,6 +140,15 @@ function App() {
   const depthProgress = getDepthProgress(currentTime, currentDepth)
   const depthPreset = currentDepth
     ? getDepthPreset(currentDepth.preset)
+    : null
+
+  const compositionProgress = getCompositionProgress(
+    currentTime,
+    currentComposition
+  )
+
+  const compositionPreset = currentComposition
+    ? getCompositionPreset(currentComposition.preset)
     : null
 
   let audioGain = 1
@@ -303,6 +320,11 @@ function App() {
         <div>foreground scale: {foregroundScale.toFixed(2)}</div>
         <div>middle scale: {middleScale.toFixed(2)}</div>
         <div>background scale: {backgroundScale.toFixed(2)}</div>
+
+        <div>composition preset: {currentComposition?.preset ?? 'none'}</div>
+        <div>composition progress: {compositionProgress.toFixed(2)}</div>
+        <div>composition layout: {compositionPreset?.layout ?? 'none'}</div>
+        <div>composition emphasis: {compositionPreset?.emphasis ?? 'none'}</div>
 
         <div>subtitle: {currentSubtitle?.text || 'none'}</div>
         <div>status: {isPlaying ? 'playing' : 'paused'}</div>
