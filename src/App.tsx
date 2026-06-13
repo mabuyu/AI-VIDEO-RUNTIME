@@ -58,6 +58,13 @@ import {
 } from './utils/compositionParser'
 import { getCompositionPreset } from './utils/compositionPresets'
 import { validateCompositions } from './utils/compositionValidator'
+import {
+  getAssetCount,
+  getPreloadAssetCount,
+  hasAsset,
+  resolveAsset,
+} from './utils/assetRegistry'
+import { validateAssets } from './utils/assetValidator'
 
 function App() {
   const FPS = getTimelineFPS()
@@ -76,6 +83,7 @@ function App() {
     console.log('Effect Validation:', validateEffects())
     console.log('Depth Validation:', validateDepths())
     console.log('Composition Validation:', validateCompositions())
+    console.log('Asset Validation:', validateAssets())
   }, [])
 
   useEffect(() => {
@@ -126,6 +134,11 @@ function App() {
   const currentAudio = getCurrentAudio(currentTime)
   const currentDepth = getCurrentDepth(currentTime)
   const currentComposition = getCurrentComposition(currentTime)
+
+  const assetCount = getAssetCount()
+  const preloadAssetCount = getPreloadAssetCount()
+  const heroAssetSrc = resolveAsset('hero-image')
+  const hasHeroAsset = hasAsset('hero-image')
 
   const effectProgress = getEffectProgress(currentTime, currentEffect)
   const effectPreset = currentEffect
@@ -325,6 +338,11 @@ function App() {
         <div>composition progress: {compositionProgress.toFixed(2)}</div>
         <div>composition layout: {compositionPreset?.layout ?? 'none'}</div>
         <div>composition emphasis: {compositionPreset?.emphasis ?? 'none'}</div>
+
+        <div>asset count: {assetCount}</div>
+        <div>preload asset count: {preloadAssetCount}</div>
+        <div>hero asset: {hasHeroAsset ? 'yes' : 'no'}</div>
+        <div>hero src: {heroAssetSrc ?? 'none'}</div>
 
         <div>subtitle: {currentSubtitle?.text || 'none'}</div>
         <div>status: {isPlaying ? 'playing' : 'paused'}</div>
