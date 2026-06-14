@@ -79,7 +79,21 @@ import {
 } from './utils/resourceManager'
 
 import { validateResources } from './utils/resourceValidator'
+import {
+  getGeneratedProjectName,
+  getGeneratedResourceCount,
+  getGeneratedSceneCount,
+  getGeneratedSubtitleCount,
+  isAIPlanReady,
+} from './utils/aiManager'
 
+import {
+  getAIModel,
+  getAIPrompt,
+  getAIStatus,
+} from './utils/aiParser'
+
+import { validateAIPlan } from './utils/aiValidator'
 function App() {
   const FPS = getTimelineFPS()
 
@@ -103,6 +117,7 @@ function App() {
     console.log('Asset Validation:', validateAssets())
     console.log('Project Validation:', validateProject())
     console.log('Resource Validation:', validateResources())
+    console.log('AI Validation:', validateAIPlan())
   }, [])
 
   useEffect(() => {
@@ -167,7 +182,16 @@ function App() {
 
   const hasHeroResource =
     hasEnabledResource('hero-resource')
+  const aiPrompt = getAIPrompt()
+  const aiModel = getAIModel()
+  const aiStatus = getAIStatus()
 
+  const aiReady = isAIPlanReady()
+
+  const aiProject = getGeneratedProjectName()
+  const aiSceneCount = getGeneratedSceneCount()
+  const aiResourceCount = getGeneratedResourceCount()
+  const aiSubtitleCount = getGeneratedSubtitleCount()
   const effectProgress = getEffectProgress(currentTime, currentEffect)
   const effectPreset = currentEffect
     ? getEffectPreset(currentEffect.preset)
@@ -399,7 +423,14 @@ function App() {
         hero resource:{' '}
         {hasHeroResource ? 'yes' : 'no'}
       </div>
-
+      <div>ai model: {aiModel}</div>
+      <div>ai status: {aiStatus}</div>
+      <div>ai ready: {aiReady ? 'yes' : 'no'}</div>
+      <div>ai project: {aiProject}</div>
+      <div>ai scenes: {aiSceneCount}</div>
+      <div>ai resources: {aiResourceCount}</div>
+      <div>ai subtitles: {aiSubtitleCount}</div>
+      <div>ai prompt: {aiPrompt}</div>
         <div>subtitle: {currentSubtitle?.text || 'none'}</div>
         <div>status: {isPlaying ? 'playing' : 'paused'}</div>
       </div>
