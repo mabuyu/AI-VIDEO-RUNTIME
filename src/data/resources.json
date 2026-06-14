@@ -1,0 +1,16 @@
+[
+  {
+    "id": "hero-resource",
+    "assetId": "hero-image",
+    "priority": "high",
+    "preload": true,
+    "enabled": true
+  },
+  {
+    "id": "react-logo-resource",
+    "assetId": "react-logo",
+    "priority": "normal",
+    "preload": false,
+    "enabled": true
+  }
+]

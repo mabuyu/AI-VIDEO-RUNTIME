@@ -70,6 +70,15 @@ import {
   getProjectResolution,
 } from './utils/projectParser'
 import { validateProject } from './utils/projectValidator'
+import {
+  getEnabledResourceCount,
+  getHighPriorityResourceCount,
+  getPreloadResourceCount,
+  getResourceCount,
+  hasEnabledResource,
+} from './utils/resourceManager'
+
+import { validateResources } from './utils/resourceValidator'
 
 function App() {
   const FPS = getTimelineFPS()
@@ -93,6 +102,7 @@ function App() {
     console.log('Composition Validation:', validateCompositions())
     console.log('Asset Validation:', validateAssets())
     console.log('Project Validation:', validateProject())
+    console.log('Resource Validation:', validateResources())
   }, [])
 
   useEffect(() => {
@@ -148,6 +158,15 @@ function App() {
   const preloadAssetCount = getPreloadAssetCount()
   const heroAssetSrc = resolveAsset('hero-image')
   const hasHeroAsset = hasAsset('hero-image')
+
+  const resourceCount = getResourceCount()
+  const enabledResourceCount = getEnabledResourceCount()
+  const preloadResourceCount = getPreloadResourceCount()
+  const highPriorityResourceCount =
+    getHighPriorityResourceCount()
+
+  const hasHeroResource =
+    hasEnabledResource('hero-resource')
 
   const effectProgress = getEffectProgress(currentTime, currentEffect)
   const effectPreset = currentEffect
@@ -361,6 +380,25 @@ function App() {
         <div>preload asset count: {preloadAssetCount}</div>
         <div>hero asset: {hasHeroAsset ? 'yes' : 'no'}</div>
         <div>hero src: {heroAssetSrc ?? 'none'}</div>
+        <div>resource count: {resourceCount}</div>
+
+      <div>
+        enabled resource count: {enabledResourceCount}
+      </div>
+
+      <div>
+        preload resource count: {preloadResourceCount}
+      </div>
+
+      <div>
+        high priority resource count:{' '}
+        {highPriorityResourceCount}
+      </div>
+
+      <div>
+        hero resource:{' '}
+        {hasHeroResource ? 'yes' : 'no'}
+      </div>
 
         <div>subtitle: {currentSubtitle?.text || 'none'}</div>
         <div>status: {isPlaying ? 'playing' : 'paused'}</div>
