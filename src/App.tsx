@@ -65,9 +65,17 @@ import {
   resolveAsset,
 } from './utils/assetRegistry'
 import { validateAssets } from './utils/assetValidator'
+import {
+  getProjectConfig,
+  getProjectResolution,
+} from './utils/projectParser'
+import { validateProject } from './utils/projectValidator'
 
 function App() {
   const FPS = getTimelineFPS()
+
+  const projectConfig = getProjectConfig()
+  const projectResolution = getProjectResolution()
 
   const scenes = getScenes()
   const totalDuration = getTimelineDuration()
@@ -84,6 +92,7 @@ function App() {
     console.log('Depth Validation:', validateDepths())
     console.log('Composition Validation:', validateCompositions())
     console.log('Asset Validation:', validateAssets())
+    console.log('Project Validation:', validateProject())
   }, [])
 
   useEffect(() => {
@@ -288,6 +297,15 @@ function App() {
       </DepthLayer>
 
       <div className="debug-panel">
+        <div>project title: {projectConfig.title}</div>
+        <div>project author: {projectConfig.author}</div>
+        <div>project version: {projectConfig.version}</div>
+        <div>
+          project resolution: {projectResolution.width} x{' '}
+          {projectResolution.height}
+        </div>
+        <div>project duration: {projectConfig.duration}ms</div>
+
         <div>frame: {frame}</div>
         <div>time: {Math.floor(currentTime)}ms</div>
         <div>scene: {currentScene.scene}</div>
