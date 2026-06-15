@@ -94,10 +94,14 @@ import {
 } from './utils/aiParser'
 
 import { validateAIPlan } from './utils/aiValidator'
+import { getRuntimeSummary } from './utils/runtimeSummary'
+import { getRuntimeIntegration } from './utils/runtimeIntegration'
 function App() {
   const FPS = getTimelineFPS()
 
   const projectConfig = getProjectConfig()
+  const runtimeSummary = getRuntimeSummary()
+  const runtimeIntegration = getRuntimeIntegration()
   const projectResolution = getProjectResolution()
 
   const scenes = getScenes()
@@ -340,6 +344,30 @@ function App() {
       </DepthLayer>
 
       <div className="debug-panel">
+        <div>runtime project: {runtimeSummary.projectTitle}</div>
+        <div>runtime assets: {runtimeSummary.assetCount}</div>
+        <div>runtime resources: {runtimeSummary.resourceCount}</div>
+        <div>runtime ai ready: {runtimeSummary.aiReady ? 'yes' : 'no'}</div>
+        <div>
+            integration ready:{' '}
+            {runtimeIntegration.integrationReady ? 'yes' : 'no'}
+        </div>
+        <div>
+            integration project:{' '}
+            {runtimeIntegration.projectTitle}
+        </div>
+        <div>
+          integration assets:{' '}
+          {runtimeIntegration.assetCount}
+        </div>
+        <div>
+          integration resources:{' '}
+          {runtimeIntegration.resourceCount}
+        </div>
+        <div>
+          integration ai:{' '}
+          {runtimeIntegration.aiReady ? 'yes' : 'no'}
+        </div>
         <div>project title: {projectConfig.title}</div>
         <div>project author: {projectConfig.author}</div>
         <div>project version: {projectConfig.version}</div>
