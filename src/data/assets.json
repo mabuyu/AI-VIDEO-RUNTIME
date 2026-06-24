@@ -1,0 +1,20 @@
+[
+  {
+    "id": "hero-image",
+    "type": "image",
+    "src": "/src/assets/hero.png",
+    "preload": true
+  },
+  {
+    "id": "react-logo",
+    "type": "svg",
+    "src": "/src/assets/react.svg",
+    "preload": false
+  },
+  {
+    "id": "vite-logo",
+    "type": "svg",
+    "src": "/src/assets/vite.svg",
+    "preload": false
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "title": "AI Video Runtime Demo",
+  "author": "Mr Ma",
+  "version": "1.0.0",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "duration": 5500,
+  "background": "#0f172a"
+}

@@ -1,0 +1,9 @@
+{
+  "prompt": "Create a modern AI video about React Runtime",
+  "model": "gpt-runtime",
+  "status": "ready",
+  "generatedProject": "AI Video Runtime Demo",
+  "generatedScenes": 5,
+  "generatedResources": 2,
+  "generatedSubtitles": 6
+}

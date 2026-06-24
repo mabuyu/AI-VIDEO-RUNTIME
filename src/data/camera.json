@@ -1,0 +1,54 @@
+[
+  {
+    "id": "camera-hook",
+    "preset": "slowPush",
+    "start": 0,
+    "duration": 1200,
+    "scaleFrom": 1,
+    "scaleTo": 1,
+    "xFrom": 0,
+    "xTo": 0,
+    "yFrom": 0,
+    "yTo": 0,
+    "shake": 0
+  },
+  {
+    "id": "camera-problem",
+    "preset": "dramaticZoom",
+    "start": 1200,
+    "duration": 1500,
+    "scaleFrom": 1,
+    "scaleTo": 1,
+    "xFrom": 0,
+    "xTo": 0,
+    "yFrom": 0,
+    "yTo": 0,
+    "shake": 0
+  },
+  {
+    "id": "camera-value",
+    "preset": "cinematicPan",
+    "start": 2700,
+    "duration": 1500,
+    "scaleFrom": 1,
+    "scaleTo": 1,
+    "xFrom": 0,
+    "xTo": 0,
+    "yFrom": 0,
+    "yTo": 0,
+    "shake": 0
+  },
+  {
+    "id": "camera-contrast",
+    "preset": "handheld",
+    "start": 4200,
+    "duration": 1500,
+    "scaleFrom": 1,
+    "scaleTo": 1,
+    "xFrom": 0,
+    "xTo": 0,
+    "yFrom": 0,
+    "yTo": 0,
+    "shake": 0
+  }
+]

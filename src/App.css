@@ -367,18 +367,30 @@
   top: 12px;
   left: 12px;
 
-  z-index: 20;
+  width: 190px;
+  max-height: 430px;
+  overflow-y: auto;
 
+  z-index: 40;
   font-size: 11px;
-  line-height: 1.5;
+  line-height: 1.35;
 
-  color: rgba(255, 255, 255, 0.65);
+  padding: 10px;
+  border-radius: 12px;
 
-  background: rgba(0, 0, 0, 0.35);
-  padding: 8px 10px;
-  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.65);
+}
+.debug-panel::-webkit-scrollbar {
+  width: 4px;
+}
 
-  backdrop-filter: blur(8px);
+.debug-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 4px;
+}
+
+.debug-panel::-webkit-scrollbar-track {
+  background: transparent;
 }
 .progress-bar {
   position: absolute;
@@ -393,7 +405,7 @@
   background: rgba(255, 255, 255, 0.12);
   border-radius: 999px;
 
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .progress-fill {
@@ -445,7 +457,7 @@
 }
 .play-button {
   position: absolute;
-  bottom: 36px;
+  bottom: 70px;
   left: 50%;
 
   transform: translateX(-50%);
@@ -477,29 +489,7 @@
   background: rgba(255, 59, 92, 0.65);
 }
 .shortcut-panel {
-  position: absolute;
-
-  left: 12px;
-  bottom: 12px;
-
-  z-index: 40;
-
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-
-  padding: 10px 12px;
-
-  border-radius: 12px;
-
-  font-size: 10px;
-  font-weight: 700;
-
-  color: rgba(255,255,255,0.7);
-
-  background: rgba(0,0,0,0.35);
-
-  backdrop-filter: blur(10px);
+  display: none;
 }
 .timeline-item {
   border: none;
@@ -792,4 +782,70 @@
   color: white;
 
   white-space: nowrap;
+}
+.background-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.22;
+}
+
+.background-orb {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  filter: blur(18px);
+  opacity: 0.45;
+}
+
+.orb-left {
+  left: -60px;
+  top: 120px;
+
+  width: 220px;
+  height: 220px;
+
+  background: rgba(0,255,220,0.7);
+
+  filter: blur(40px);
+}
+
+.orb-right {
+  right: -60px;
+  top: 220px;
+
+  width: 220px;
+  height: 220px;
+
+  background: rgba(255,0,120,0.7);
+
+  filter: blur(40px);
+}
+
+.foreground-vignette {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.85);
+}
+
+.foreground-light-streak {
+  position: absolute;
+
+  left: -40%;
+  top: 45%;
+
+  width: 180%;
+  height: 40px;
+
+  background: rgba(255,255,255,0.35);
+
+  filter: blur(20px);
+
+  transform: rotate(-8deg);
+
+  opacity: 0.8;
 }

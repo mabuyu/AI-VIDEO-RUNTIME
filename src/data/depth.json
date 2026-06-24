@@ -1,0 +1,26 @@
+[
+  {
+    "id": "depth-hook",
+    "start": 0,
+    "duration": 1200,
+    "preset": "near"
+  },
+  {
+    "id": "depth-problem",
+    "start": 1200,
+    "duration": 1500,
+    "preset": "deep"
+  },
+  {
+    "id": "depth-value",
+    "start": 2700,
+    "duration": 1500,
+    "preset": "balanced"
+  },
+  {
+    "id": "depth-contrast",
+    "start": 4200,
+    "duration": 1300,
+    "preset": "cinematic"
+  }
+]

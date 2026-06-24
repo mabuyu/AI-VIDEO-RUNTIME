@@ -1,0 +1,26 @@
+[
+  {
+    "id": "subtitle-1",
+    "start": 0,
+    "duration": 1200,
+    "text": "AI正在改变视频行业"
+  },
+  {
+    "id": "subtitle-2",
+    "start": 1200,
+    "duration": 1500,
+    "text": "传统剪辑正在被重构"
+  },
+  {
+    "id": "subtitle-3",
+    "start": 2700,
+    "duration": 1500,
+    "text": "数据驱动视频正在成为趋势"
+  },
+  {
+    "id": "subtitle-4",
+    "start": 4200,
+    "duration": 1500,
+    "text": "Timeline正在统一调度Runtime"
+  }
+]
