@@ -59,7 +59,7 @@
   {
     "scene": "contrast",
     "start": 4200,
-    "duration": 1200,
+    "duration": 1500,
     "text": "传统剪辑正在被重构",
     "highlight": "传统剪辑",
     "background": "linear-gradient(135deg, #111, #3a1f1f)",
