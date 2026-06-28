@@ -1,5 +1,14 @@
 export { adaptRuntimeData } from './adaptRuntimeData'
 export {
+  RUNTIME_VALIDATION_CODES,
+  validateCamera,
+  validateProject,
+  validateRuntimeData,
+  validateScenes,
+  validateSubtitles,
+  validateTimeline,
+} from './validation'
+export {
   createCameraReader,
   createProjectReader,
   createRuntimeReaders,
@@ -14,6 +23,14 @@ export type {
   RuntimeDataAdapterResult,
   RuntimeDataV1,
 } from './types'
+
+export type {
+  RuntimeDataValidationResult,
+  RuntimeValidationDomain,
+  RuntimeValidationIssue,
+  RuntimeValidationIssueCode,
+  RuntimeValidationSeverity,
+} from './validation'
 
 export type {
   CameraReader,
