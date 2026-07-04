@@ -1,4 +1,5 @@
 export { adaptRuntimeData } from './adaptRuntimeData'
+export { createValidatedRuntimeReaders } from './consumption'
 export {
   RUNTIME_VALIDATION_CODES,
   validateCamera,
@@ -16,6 +17,10 @@ export {
   createSubtitleReader,
   createTimelineReader,
 } from './readers'
+
+export type {
+  CreateValidatedRuntimeReadersResult,
+} from './consumption'
 
 export type {
   RuntimeDataAdapterDiagnostic,
