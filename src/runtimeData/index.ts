@@ -1,5 +1,11 @@
 export { adaptRuntimeData } from './adaptRuntimeData'
 export { createValidatedRuntimeReaders } from './consumption'
+export { loadStaticRuntimeData } from './loaders'
+export {
+  createGeneratedRuntimeDataSource,
+  createStaticRuntimeDataSource,
+  resolveRuntimeDataSource,
+} from './sources'
 export {
   RUNTIME_VALIDATION_CODES,
   validateCamera,
@@ -28,6 +34,13 @@ export type {
   RuntimeDataAdapterResult,
   RuntimeDataV1,
 } from './types'
+
+export type {
+  GeneratedRuntimeDataSource,
+  RuntimeDataSource,
+  RuntimeDataSourceKind,
+  StaticRuntimeDataSource,
+} from './sources'
 
 export type {
   RuntimeDataValidationResult,
