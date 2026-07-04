@@ -13,6 +13,12 @@
       "type": "subtitle",
       "source": "subtitles.json",
       "enabled": true
+    },
+    {
+      "id": "camera-track-main",
+      "type": "camera",
+      "source": "camera.json",
+      "enabled": true
     }
   ]
 }

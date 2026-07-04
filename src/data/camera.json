@@ -1,54 +1,50 @@
 [
   {
-    "id": "camera-hook",
-    "preset": "slowPush",
+    "id": "camera-track-1",
     "start": 0,
     "duration": 1200,
     "scaleFrom": 1,
-    "scaleTo": 1,
-    "xFrom": 0,
+    "scaleTo": 1.04,
+    "xFrom": -8,
     "xTo": 0,
-    "yFrom": 0,
+    "yFrom": 8,
     "yTo": 0,
-    "shake": 0
+    "shake": 0.4
   },
   {
-    "id": "camera-problem",
-    "preset": "dramaticZoom",
+    "id": "camera-track-2",
     "start": 1200,
     "duration": 1500,
     "scaleFrom": 1,
-    "scaleTo": 1,
-    "xFrom": 0,
+    "scaleTo": 1.05,
+    "xFrom": 10,
     "xTo": 0,
-    "yFrom": 0,
+    "yFrom": 12,
     "yTo": 0,
-    "shake": 0
+    "shake": 0.6
   },
   {
-    "id": "camera-value",
-    "preset": "cinematicPan",
+    "id": "camera-track-3",
     "start": 2700,
     "duration": 1500,
     "scaleFrom": 1,
-    "scaleTo": 1,
-    "xFrom": 0,
+    "scaleTo": 1.06,
+    "xFrom": -12,
     "xTo": 0,
-    "yFrom": 0,
+    "yFrom": 10,
     "yTo": 0,
-    "shake": 0
+    "shake": 0.5
   },
   {
-    "id": "camera-contrast",
-    "preset": "handheld",
+    "id": "camera-track-4",
     "start": 4200,
     "duration": 1500,
     "scaleFrom": 1,
-    "scaleTo": 1,
-    "xFrom": 0,
+    "scaleTo": 1.04,
+    "xFrom": 8,
     "xTo": 0,
-    "yFrom": 0,
+    "yFrom": -6,
     "yTo": 0,
-    "shake": 0
+    "shake": 0.8
   }
 ]
