@@ -1,6 +1,8 @@
 ﻿import type {
   CameraReader,
+  ProjectReader,
   RuntimeCamera,
+  RuntimeProject,
   RuntimeReaders,
   RuntimeScene,
   RuntimeSubtitle,
@@ -10,6 +12,15 @@
 } from '../../runtimeData'
 
 export type SceneLifecycleState = 'enter' | 'active' | 'exit' | 'inactive'
+
+export interface ProjectService {
+  getProjectConfig(): RuntimeProject
+  getProjectTitle(): string
+  getProjectResolution(): {
+    width: number
+    height: number
+  }
+}
 
 export interface PlaybackService {
   getTimelineFPS(): number
@@ -28,9 +39,11 @@ export interface SceneRuntimeSnapshot {
 }
 
 export interface SceneService {
+  getScenes(): readonly RuntimeScene[]
   getCurrentScene(timeMs: number): RuntimeScene | null
   getCurrentSceneState(timeMs: number): SceneRuntimeSnapshot
   getSceneLifecycle(timeMs: number): SceneLifecycleState
+  getGlobalProgress(timeMs: number): number
 }
 
 export interface SubtitleRuntimeState {
@@ -56,6 +69,7 @@ export interface CameraService {
 }
 
 export interface RuntimeServices {
+  readonly project: ProjectService
   readonly playback: PlaybackService
   readonly scene: SceneService
   readonly subtitle: SubtitleService
@@ -68,6 +82,10 @@ export interface RuntimeServiceDependencies {
 
 export interface PlaybackServiceDependencies {
   readonly timelineReader: TimelineReader
+}
+
+export interface ProjectServiceDependencies {
+  readonly projectReader: ProjectReader
 }
 
 export interface SceneServiceDependencies {

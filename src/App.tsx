@@ -7,14 +7,6 @@ import Subtitle from './components/Subtitle'
 import './App.css'
 
 import { cameraShake } from './utils/camera'
-import { getSceneState } from './utils/sceneLifecycle'
-import {
-  getCurrentScene,
-  getCurrentSceneIndex,
-  getGlobalProgress,
-  getSceneProgress,
-  getScenes,
-} from './utils/sceneParser'
 import { renderSceneByType } from './utils/sceneRenderer'
 import { interpolate } from './utils/motion'
 import {
@@ -22,15 +14,6 @@ import {
   getExitStyle,
   getTransitionProgress,
 } from './utils/transition'
-import {
-  getTimelineDuration,
-  getTimelineFPS,
-} from './utils/timelineParser'
-import { getCurrentCamera } from './utils/cameraParser'
-import { validateCamera } from './utils/cameraValidator'
-import { validateTimeline } from './utils/timelineValidator'
-import { validateSubtitles } from './utils/subtitleValidator'
-import { getCurrentSubtitle } from './utils/subtitleParser'
 import {
   getCurrentEffect,
   getEffectProgress,
@@ -66,11 +49,6 @@ import {
 } from './utils/assetRegistry'
 import { validateAssets } from './utils/assetValidator'
 import {
-  getProjectConfig,
-  getProjectResolution,
-} from './utils/projectParser'
-import { validateProject } from './utils/projectValidator'
-import {
   getEnabledResourceCount,
   getHighPriorityResourceCount,
   getPreloadResourceCount,
@@ -94,32 +72,36 @@ import {
 } from './utils/aiParser'
 
 import { validateAIPlan } from './utils/aiValidator'
-import { getRuntimeSummary } from './utils/runtimeSummary'
-import { getRuntimeIntegration } from './utils/runtimeIntegration'
-function App() {
-  const FPS = getTimelineFPS()
+import { createRuntimeBootstrap } from './runtime'
+import type { RuntimeServices } from './runtime'
+import { createStaticRuntimeDataSource } from './runtimeData'
 
-  const projectConfig = getProjectConfig()
-  const runtimeSummary = getRuntimeSummary()
-  const runtimeIntegration = getRuntimeIntegration()
-  const projectResolution = getProjectResolution()
+const runtimeBootstrap = createRuntimeBootstrap(
+  createStaticRuntimeDataSource(),
+)
 
-  const scenes = getScenes()
-  const totalDuration = getTimelineDuration()
-  const totalFrames = Math.floor((totalDuration / 1000) * FPS)
+interface RuntimeAppProps {
+  readonly services: RuntimeServices
+}
+
+function RuntimeApp({ services }: RuntimeAppProps) {
+  const FPS = services.playback.getTimelineFPS()
+
+  const projectConfig = services.project.getProjectConfig()
+  const projectResolution = services.project.getProjectResolution()
+
+  const scenes = services.scene.getScenes()
+  const totalDuration = services.playback.getTimelineDuration()
+  const totalFrames = services.playback.getTotalFrames()
 
   const [frame, setFrame] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
 
   useEffect(() => {
-    console.log('Timeline Validation:', validateTimeline())
-    console.log('Subtitle Validation:', validateSubtitles())
-    console.log('Camera Validation:', validateCamera())
     console.log('Effect Validation:', validateEffects())
     console.log('Depth Validation:', validateDepths())
     console.log('Composition Validation:', validateCompositions())
     console.log('Asset Validation:', validateAssets())
-    console.log('Project Validation:', validateProject())
     console.log('Resource Validation:', validateResources())
     console.log('AI Validation:', validateAIPlan())
   }, [])
@@ -165,9 +147,10 @@ function App() {
     }
   }, [totalFrames])
 
-  const currentTime = (frame / FPS) * 1000
-  const currentSubtitle = getCurrentSubtitle(currentTime)
-  const currentCamera = getCurrentCamera(currentTime)
+  const currentTime = services.playback.frameToTimeMs(frame)
+  const currentSubtitle = services.subtitle.getCurrentSubtitle(currentTime)
+  const cameraState = services.camera.getCurrentCameraState(currentTime)
+  const currentCamera = cameraState.camera
   const currentEffect = getCurrentEffect(currentTime)
   const currentAudio = getCurrentAudio(currentTime)
   const currentDepth = getCurrentDepth(currentTime)
@@ -234,22 +217,38 @@ function App() {
     }
   }
 
-  const cameraProgress = currentCamera
-    ? Math.min(
-        Math.max(
-          (currentTime - currentCamera.start) / currentCamera.duration,
-          0
-        ),
-        1
-      )
-    : 0
+  const cameraProgress = cameraState.progress
 
-  const currentScene = getCurrentScene(currentTime)
-  const currentIndex = getCurrentSceneIndex(currentTime)
-  const sceneProgress = getSceneProgress(currentTime, currentScene)
-  const sceneState = getSceneState(sceneProgress)
-  const globalProgress = getGlobalProgress(currentTime)
+  const currentSceneState = services.scene.getCurrentSceneState(currentTime)
+  const currentScene = currentSceneState.scene
+  const currentIndex = currentSceneState.index
+  const sceneProgress = currentSceneState.progress
+  const sceneState = currentSceneState.lifecycle
+  const globalProgress = services.scene.getGlobalProgress(currentTime)
   const transitionProgress = getTransitionProgress(sceneProgress, 0.8, 1)
+
+  if (!currentScene) {
+    return (
+      <div
+        className='video'
+        style={{ background: projectConfig.background }}
+        data-runtime-state='inactive'
+      >
+        <div className='debug-panel' role='status'>
+          <div>project title: {projectConfig.title}</div>
+          <div>fps: {FPS}</div>
+          <div>duration: {totalDuration}ms</div>
+          <div>frame: {frame}</div>
+          <div>time: {Math.floor(currentTime)}ms</div>
+          <div>scene: none</div>
+          <div>scene index: -1</div>
+          <div>scene state: inactive</div>
+          <div>subtitle: {currentSubtitle?.text ?? 'none'}</div>
+          <div>camera active: {currentCamera ? 'yes' : 'no'}</div>
+        </div>
+      </div>
+    )
+  }
 
   const cameraScale = currentCamera
     ? interpolate(
@@ -301,7 +300,7 @@ function App() {
   `
 
   const jumpToScene = (sceneStart: number) => {
-    const targetFrame = Math.floor((sceneStart / 1000) * FPS)
+    const targetFrame = services.playback.timeMsToFrame(sceneStart)
     setFrame(targetFrame)
     setIsPlaying(false)
   }
@@ -312,7 +311,7 @@ function App() {
     const ratio = clickX / rect.width
     const targetTime = totalDuration * ratio
 
-    setFrame(Math.floor((targetTime / 1000) * FPS))
+    setFrame(services.playback.timeMsToFrame(targetTime))
     setIsPlaying(false)
   }
 
@@ -344,30 +343,6 @@ function App() {
       </DepthLayer>
 
       <div className="debug-panel">
-        <div>runtime project: {runtimeSummary.projectTitle}</div>
-        <div>runtime assets: {runtimeSummary.assetCount}</div>
-        <div>runtime resources: {runtimeSummary.resourceCount}</div>
-        <div>runtime ai ready: {runtimeSummary.aiReady ? 'yes' : 'no'}</div>
-        <div>
-            integration ready:{' '}
-            {runtimeIntegration.integrationReady ? 'yes' : 'no'}
-        </div>
-        <div>
-            integration project:{' '}
-            {runtimeIntegration.projectTitle}
-        </div>
-        <div>
-          integration assets:{' '}
-          {runtimeIntegration.assetCount}
-        </div>
-        <div>
-          integration resources:{' '}
-          {runtimeIntegration.resourceCount}
-        </div>
-        <div>
-          integration ai:{' '}
-          {runtimeIntegration.aiReady ? 'yes' : 'no'}
-        </div>
         <div>project title: {projectConfig.title}</div>
         <div>project author: {projectConfig.author}</div>
         <div>project version: {projectConfig.version}</div>
@@ -376,6 +351,8 @@ function App() {
           {projectResolution.height}
         </div>
         <div>project duration: {projectConfig.duration}ms</div>
+        <div>fps: {FPS}</div>
+        <div>timeline duration: {totalDuration}ms</div>
 
         <div>frame: {frame}</div>
         <div>time: {Math.floor(currentTime)}ms</div>
@@ -391,7 +368,7 @@ function App() {
         <div>camera x: {cameraX.toFixed(1)}</div>
         <div>camera y: {cameraY.toFixed(1)}</div>
         <div>camera active: {currentCamera ? 'yes' : 'no'}</div>
-        <div>camera preset: {currentCamera?.preset ?? 'none'}</div>
+        <div>camera id: {currentCamera?.id ?? 'none'}</div>
         <div>camera progress: {cameraProgress.toFixed(2)}</div>
         <div>shake x: {shake.x.toFixed(2)}</div>
         <div>shake y: {shake.y.toFixed(2)}</div>
@@ -521,7 +498,7 @@ function App() {
             time={currentTime}
           />
 
-          <Subtitle subtitle={currentSubtitle} />
+          <Subtitle subtitle={currentSubtitle ?? undefined} />
 
           <div
             style={{
@@ -548,6 +525,26 @@ function App() {
       </DepthLayer>
     </div>
   )
+}
+
+function App() {
+  if (!runtimeBootstrap.ok) {
+    return (
+      <div className='video' data-runtime-state='bootstrap-error'>
+        <div className='debug-panel' role='alert'>
+          <div>Runtime bootstrap failed.</div>
+          <div>source: {runtimeBootstrap.sourceKind}</div>
+          {runtimeBootstrap.issues.map((issue, index) => (
+            <div key={`${issue.code}-${index}`}>
+              {issue.code}: {issue.message}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return <RuntimeApp services={runtimeBootstrap.services} />
 }
 
 export default App

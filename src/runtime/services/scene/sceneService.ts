@@ -45,12 +45,18 @@ export function createSceneService({
   }
 
   return {
+    getScenes() {
+      return sceneReader.getScenes()
+    },
     getCurrentScene(timeMs: number) {
       return sceneReader.getCurrentScene(timeMs)
     },
     getCurrentSceneState,
     getSceneLifecycle(timeMs: number) {
       return getCurrentSceneState(timeMs).lifecycle
+    },
+    getGlobalProgress(timeMs: number) {
+      return sceneReader.getGlobalProgress(timeMs)
     },
   }
 }
