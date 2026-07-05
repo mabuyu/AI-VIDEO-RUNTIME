@@ -11,7 +11,12 @@ export interface RuntimeDebugProjectMetadata {
   readonly version: string
   readonly width: number
   readonly height: number
+  readonly duration: number
   readonly background: string
+}
+
+export interface RuntimeDebugSceneState extends SceneRuntimeSnapshot {
+  readonly globalProgress: number
 }
 
 export interface RuntimeDebugSnapshot {
@@ -22,7 +27,7 @@ export interface RuntimeDebugSnapshot {
   readonly duration: number
   readonly frame: number
   readonly timeMs: number
-  readonly scene: SceneRuntimeSnapshot
+  readonly scene: RuntimeDebugSceneState
   readonly subtitle: SubtitleRuntimeState
   readonly camera: CameraRuntimeState
 }

@@ -7,6 +7,7 @@ export type { RuntimeBootstrapResult } from './bootstrap'
 export type { RuntimeContext } from './context'
 export type {
   RuntimeDebugProjectMetadata,
+  RuntimeDebugSceneState,
   RuntimeDebugSnapshot,
 } from './debug'
 export type { RuntimeServices } from './services'

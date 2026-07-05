@@ -72,8 +72,12 @@ import {
 } from './utils/aiParser'
 
 import { validateAIPlan } from './utils/aiValidator'
-import { createRuntimeBootstrap } from './runtime'
-import type { RuntimeServices } from './runtime'
+import {
+  createRuntimeBootstrap,
+  createRuntimeContext,
+  createRuntimeDebugSnapshot,
+} from './runtime'
+import type { RuntimeContext } from './runtime'
 import { createStaticRuntimeDataSource } from './runtimeData'
 
 const runtimeBootstrap = createRuntimeBootstrap(
@@ -81,14 +85,14 @@ const runtimeBootstrap = createRuntimeBootstrap(
 )
 
 interface RuntimeAppProps {
-  readonly services: RuntimeServices
+  readonly runtimeContext: RuntimeContext
 }
 
-function RuntimeApp({ services }: RuntimeAppProps) {
+function RuntimeApp({ runtimeContext }: RuntimeAppProps) {
+  const { services } = runtimeContext
   const FPS = services.playback.getTimelineFPS()
 
   const projectConfig = services.project.getProjectConfig()
-  const projectResolution = services.project.getProjectResolution()
 
   const scenes = services.scene.getScenes()
   const totalDuration = services.playback.getTimelineDuration()
@@ -148,6 +152,7 @@ function RuntimeApp({ services }: RuntimeAppProps) {
   }, [totalFrames])
 
   const currentTime = services.playback.frameToTimeMs(frame)
+  const debugSnapshot = createRuntimeDebugSnapshot(runtimeContext, currentTime)
   const currentSubtitle = services.subtitle.getCurrentSubtitle(currentTime)
   const cameraState = services.camera.getCurrentCameraState(currentTime)
   const currentCamera = cameraState.camera
@@ -223,7 +228,6 @@ function RuntimeApp({ services }: RuntimeAppProps) {
   const currentScene = currentSceneState.scene
   const currentIndex = currentSceneState.index
   const sceneProgress = currentSceneState.progress
-  const sceneState = currentSceneState.lifecycle
   const globalProgress = services.scene.getGlobalProgress(currentTime)
   const transitionProgress = getTransitionProgress(sceneProgress, 0.8, 1)
 
@@ -235,16 +239,16 @@ function RuntimeApp({ services }: RuntimeAppProps) {
         data-runtime-state='inactive'
       >
         <div className='debug-panel' role='status'>
-          <div>project title: {projectConfig.title}</div>
-          <div>fps: {FPS}</div>
-          <div>duration: {totalDuration}ms</div>
-          <div>frame: {frame}</div>
-          <div>time: {Math.floor(currentTime)}ms</div>
-          <div>scene: none</div>
-          <div>scene index: -1</div>
-          <div>scene state: inactive</div>
-          <div>subtitle: {currentSubtitle?.text ?? 'none'}</div>
-          <div>camera active: {currentCamera ? 'yes' : 'no'}</div>
+          <div>project title: {debugSnapshot.project.title}</div>
+          <div>fps: {debugSnapshot.fps}</div>
+          <div>duration: {debugSnapshot.duration}ms</div>
+          <div>frame: {debugSnapshot.frame}</div>
+          <div>time: {Math.floor(debugSnapshot.timeMs)}ms</div>
+          <div>scene: {debugSnapshot.scene.scene?.scene ?? 'none'}</div>
+          <div>scene index: {debugSnapshot.scene.index}</div>
+          <div>scene state: {debugSnapshot.scene.lifecycle}</div>
+          <div>subtitle: {debugSnapshot.subtitle.subtitle?.text ?? 'none'}</div>
+          <div>camera active: {debugSnapshot.camera.isActive ? 'yes' : 'no'}</div>
         </div>
       </div>
     )
@@ -343,33 +347,33 @@ function RuntimeApp({ services }: RuntimeAppProps) {
       </DepthLayer>
 
       <div className="debug-panel">
-        <div>project title: {projectConfig.title}</div>
-        <div>project author: {projectConfig.author}</div>
-        <div>project version: {projectConfig.version}</div>
+        <div>project title: {debugSnapshot.project.title}</div>
+        <div>project author: {debugSnapshot.project.author}</div>
+        <div>project version: {debugSnapshot.project.version}</div>
         <div>
-          project resolution: {projectResolution.width} x{' '}
-          {projectResolution.height}
+          project resolution: {debugSnapshot.project.width} x{' '}
+          {debugSnapshot.project.height}
         </div>
-        <div>project duration: {projectConfig.duration}ms</div>
-        <div>fps: {FPS}</div>
-        <div>timeline duration: {totalDuration}ms</div>
+        <div>project duration: {debugSnapshot.project.duration}ms</div>
+        <div>fps: {debugSnapshot.fps}</div>
+        <div>timeline duration: {debugSnapshot.duration}ms</div>
 
-        <div>frame: {frame}</div>
-        <div>time: {Math.floor(currentTime)}ms</div>
-        <div>scene: {currentScene.scene}</div>
-        <div>start: {currentScene.start}ms</div>
-        <div>duration: {currentScene.duration}ms</div>
-        <div>scene progress: {sceneProgress.toFixed(2)}</div>
-        <div>scene state: {sceneState}</div>
+        <div>frame: {debugSnapshot.frame}</div>
+        <div>time: {Math.floor(debugSnapshot.timeMs)}ms</div>
+        <div>scene: {debugSnapshot.scene.scene?.scene ?? 'none'}</div>
+        <div>start: {debugSnapshot.scene.scene?.start ?? 0}ms</div>
+        <div>duration: {debugSnapshot.scene.scene?.duration ?? 0}ms</div>
+        <div>scene progress: {debugSnapshot.scene.progress.toFixed(2)}</div>
+        <div>scene state: {debugSnapshot.scene.lifecycle}</div>
         <div>transition progress: {transitionProgress.toFixed(2)}</div>
-        <div>global progress: {globalProgress.toFixed(2)}</div>
+        <div>global progress: {debugSnapshot.scene.globalProgress.toFixed(2)}</div>
 
         <div>camera scale: {cameraScale.toFixed(2)}</div>
         <div>camera x: {cameraX.toFixed(1)}</div>
         <div>camera y: {cameraY.toFixed(1)}</div>
-        <div>camera active: {currentCamera ? 'yes' : 'no'}</div>
-        <div>camera id: {currentCamera?.id ?? 'none'}</div>
-        <div>camera progress: {cameraProgress.toFixed(2)}</div>
+        <div>camera active: {debugSnapshot.camera.isActive ? 'yes' : 'no'}</div>
+        <div>camera id: {debugSnapshot.camera.camera?.id ?? 'none'}</div>
+        <div>camera progress: {debugSnapshot.camera.progress.toFixed(2)}</div>
         <div>shake x: {shake.x.toFixed(2)}</div>
         <div>shake y: {shake.y.toFixed(2)}</div>
 
@@ -436,7 +440,7 @@ function RuntimeApp({ services }: RuntimeAppProps) {
       <div>ai resources: {aiResourceCount}</div>
       <div>ai subtitles: {aiSubtitleCount}</div>
       <div>ai prompt: {aiPrompt}</div>
-        <div>subtitle: {currentSubtitle?.text || 'none'}</div>
+        <div>subtitle: {debugSnapshot.subtitle.subtitle?.text ?? 'none'}</div>
         <div>status: {isPlaying ? 'playing' : 'paused'}</div>
       </div>
 
@@ -488,14 +492,14 @@ function RuntimeApp({ services }: RuntimeAppProps) {
       >
         <div style={{ filter: effectFilter }}>
           <SceneStatus
-            scene={currentScene.scene}
-            state={sceneState}
-            index={currentIndex}
-            sceneProgress={sceneProgress}
-            globalProgress={globalProgress}
+            scene={debugSnapshot.scene.scene?.scene ?? 'none'}
+            state={debugSnapshot.scene.lifecycle}
+            index={debugSnapshot.scene.index}
+            sceneProgress={debugSnapshot.scene.progress}
+            globalProgress={debugSnapshot.scene.globalProgress}
             transitionProgress={transitionProgress}
-            frame={frame}
-            time={currentTime}
+            frame={debugSnapshot.frame}
+            time={debugSnapshot.timeMs}
           />
 
           <Subtitle subtitle={currentSubtitle ?? undefined} />
@@ -544,7 +548,9 @@ function App() {
     )
   }
 
-  return <RuntimeApp services={runtimeBootstrap.services} />
+  const runtimeContext = createRuntimeContext(runtimeBootstrap)
+
+  return <RuntimeApp runtimeContext={runtimeContext} />
 }
 
 export default App

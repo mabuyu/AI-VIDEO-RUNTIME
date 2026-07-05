@@ -7,6 +7,7 @@ export function createRuntimeDebugSnapshot(
 ): RuntimeDebugSnapshot {
   const { services } = context
   const project = services.project.getProjectConfig()
+  const scene = services.scene.getCurrentSceneState(timeMs)
 
   return {
     sourceKind: context.sourceKind,
@@ -19,13 +20,17 @@ export function createRuntimeDebugSnapshot(
       version: project.version,
       width: project.width,
       height: project.height,
+      duration: project.duration,
       background: project.background,
     },
     fps: services.playback.getTimelineFPS(),
     duration: services.playback.getTimelineDuration(),
     frame: services.playback.timeMsToFrame(timeMs),
     timeMs,
-    scene: services.scene.getCurrentSceneState(timeMs),
+    scene: {
+      ...scene,
+      globalProgress: services.scene.getGlobalProgress(timeMs),
+    },
     subtitle: services.subtitle.getCurrentSubtitleState(timeMs),
     camera: services.camera.getCurrentCameraState(timeMs),
   }
