@@ -1,6 +1,6 @@
 export { adaptRuntimeData } from './adaptRuntimeData'
 export { createValidatedRuntimeReaders } from './consumption'
-export { loadStaticRuntimeData } from './loaders'
+export { loadStaticRuntimeData, loadStaticRuntimeDataV2 } from './loaders'
 export {
   createGeneratedRuntimeDataSource,
   createStaticRuntimeDataSource,
