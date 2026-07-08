@@ -7,7 +7,15 @@ import {
 import type { RuntimeValidationIssue } from './types'
 import { RUNTIME_VALIDATION_CODES } from './types'
 
-const TRACK_TYPES = ['scene', 'subtitle', 'camera'] as const
+const TRACK_TYPES = [
+  'scene',
+  'subtitle',
+  'camera',
+  'effect',
+  'depth',
+  'composition',
+  'audio',
+] as const
 
 export function validateTimeline(timeline: unknown): RuntimeValidationIssue[] {
   const issues: RuntimeValidationIssue[] = []

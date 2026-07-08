@@ -19,6 +19,30 @@
       "type": "camera",
       "source": "camera.json",
       "enabled": true
+    },
+    {
+      "id": "effect-track-main",
+      "type": "effect",
+      "source": "effect.json",
+      "enabled": true
+    },
+    {
+      "id": "depth-track-main",
+      "type": "depth",
+      "source": "depth.json",
+      "enabled": true
+    },
+    {
+      "id": "composition-track-main",
+      "type": "composition",
+      "source": "composition.json",
+      "enabled": true
+    },
+    {
+      "id": "audio-track-main",
+      "type": "audio",
+      "source": "audio.json",
+      "enabled": true
     }
   ]
 }

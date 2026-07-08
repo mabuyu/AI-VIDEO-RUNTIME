@@ -8,9 +8,14 @@ export {
 } from './sources'
 export {
   RUNTIME_VALIDATION_CODES,
+  validateAudio,
   validateCamera,
+  validateComposition,
+  validateDepth,
+  validateEffect,
   validateProject,
   validateRuntimeData,
+  validateRuntimeDataV2,
   validateScenes,
   validateSubtitles,
   validateTimeline,
@@ -33,6 +38,15 @@ export type {
   RuntimeDataAdapterDiagnosticCode,
   RuntimeDataAdapterResult,
   RuntimeDataV1,
+  RuntimeDataV2,
+  RuntimeAudioPreset,
+  RuntimeAudioTrack,
+  RuntimeCompositionPreset,
+  RuntimeCompositionTrack,
+  RuntimeDepthPreset,
+  RuntimeDepthTrack,
+  RuntimeEffectPreset,
+  RuntimeEffectTrack,
 } from './types'
 
 export type {
@@ -44,6 +58,7 @@ export type {
 
 export type {
   RuntimeDataValidationResult,
+  RuntimeDataV2ValidationResult,
   RuntimeValidationDomain,
   RuntimeValidationIssue,
   RuntimeValidationIssueCode,

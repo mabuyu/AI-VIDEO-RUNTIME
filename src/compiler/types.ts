@@ -56,9 +56,18 @@ export interface CompilerInput {
   subtitles: SemanticSubtitle[]
 }
 
+export type CompiledTimelineTrackType =
+  | 'scene'
+  | 'subtitle'
+  | 'camera'
+  | 'effect'
+  | 'depth'
+  | 'composition'
+  | 'audio'
+
 export interface CompiledTimelineTrack {
   id: string
-  type: 'scene' | 'subtitle' | 'camera'
+  type: CompiledTimelineTrackType
   source: string
   enabled: boolean
 }
