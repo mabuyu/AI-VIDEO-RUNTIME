@@ -13,14 +13,27 @@ export interface RuntimeStateV2 {
   readonly status: 'ready'
 }
 
+export interface RuntimeDiagnosticsV2 {
+  readonly bootstrapReady: true
+  readonly readerCounts: {
+    readonly scene: number
+    readonly subtitle: number
+    readonly timelineTrack: number
+    readonly camera: number
+    readonly effect: number
+    readonly depth: number
+    readonly composition: number
+    readonly audio: number
+  }
+}
+
 export interface RuntimeContextV2 {
-  readonly bootstrap: RuntimeBootstrapV2
   readonly readiness: {
     readonly ready: true
   }
-  readonly readers: RuntimeDataV2Readers
   readonly services: RuntimeDataV2Services
   readonly state: RuntimeStateV2
+  readonly diagnostics: RuntimeDiagnosticsV2
 }
 
 export interface RuntimeContextV2Dependencies {

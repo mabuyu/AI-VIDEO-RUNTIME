@@ -4,7 +4,7 @@ import type { RuntimeDebugSnapshotV2 } from './types'
 export function createRuntimeDebugSnapshotV2(
   context: RuntimeContextV2,
 ): RuntimeDebugSnapshotV2 {
-  const { bootstrap, readers, readiness, services, state } = context
+  const { diagnostics, readiness, services, state } = context
 
   return {
     readiness: {
@@ -14,17 +14,17 @@ export function createRuntimeDebugSnapshotV2(
       status: state.status,
     },
     bootstrap: {
-      ready: bootstrap.ready,
+      ready: diagnostics.bootstrapReady,
     },
     readers: {
-      sceneCount: readers.scene.getScenes().length,
-      subtitleCount: readers.subtitle.getSubtitles().length,
-      timelineTrackCount: readers.timeline.getTimelineTracks().length,
-      cameraCount: readers.camera.getCameras().length,
-      effectCount: readers.effect.getEffects().length,
-      depthCount: readers.depth.getDepthTracks().length,
-      compositionCount: readers.composition.getCompositions().length,
-      audioCount: readers.audio.getAudioTracks().length,
+      sceneCount: diagnostics.readerCounts.scene,
+      subtitleCount: diagnostics.readerCounts.subtitle,
+      timelineTrackCount: diagnostics.readerCounts.timelineTrack,
+      cameraCount: diagnostics.readerCounts.camera,
+      effectCount: diagnostics.readerCounts.effect,
+      depthCount: diagnostics.readerCounts.depth,
+      compositionCount: diagnostics.readerCounts.composition,
+      audioCount: diagnostics.readerCounts.audio,
     },
     services: {
       projectTitle: services.project.getProjectTitle(),
