@@ -17,6 +17,9 @@ try {
   const { createRuntimeBootstrapV2: bootstrapRuntimeDataV2 } =
     await server.ssrLoadModule('/src/runtime/bootstrap/index.ts')
 
+  const { createRuntimeDataV2Services } =
+    await server.ssrLoadModule('/src/runtime/services/index.ts')
+
   const candidate = loadStaticRuntimeDataV2()
   const result = validateRuntimeDataV2(candidate)
 
@@ -28,6 +31,7 @@ try {
     const consumption = createRuntimeDataV2Consumption(result.data)
     const bootstrap = bootstrapRuntimeDataV2(consumption)
     const readers = createRuntimeDataV2Readers(bootstrap)
+    const services = createRuntimeDataV2Services(readers)
 
     console.log('Static RuntimeDataV2 validation passed')
     console.log(`ok = ${result.ok}`)
@@ -36,6 +40,13 @@ try {
     console.log(`bootstrapReady = ${bootstrap.ready}`)
     console.log(`bootstrapAccepted = ${bootstrap.consumption === consumption}`)
     console.log(`readersCreated = ${readers.effect.getEffects().length > 0}`)
+    console.log(`servicesCreated = ${services.effect.getEffects().length > 0}`)
+    console.log(
+      `effectActiveAt0 = ${services.effect.getCurrentEffectState(0).isActive}`,
+    )
+    console.log(
+      `effectActiveAt5700 = ${services.effect.getCurrentEffectState(5700).isActive}`,
+    )
     console.log(`effectAt5700 = ${readers.effect.getCurrentEffect(5700)}`)
   }
 } finally {

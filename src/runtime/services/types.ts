@@ -1,7 +1,16 @@
 ﻿import type {
+  AudioReader,
   CameraReader,
+  CompositionReader,
+  DepthReader,
+  EffectReader,
   ProjectReader,
+  RuntimeAudio,
   RuntimeCamera,
+  RuntimeComposition,
+  RuntimeDataV2Readers,
+  RuntimeDepth,
+  RuntimeEffect,
   RuntimeProject,
   RuntimeReaders,
   RuntimeScene,
@@ -76,6 +85,48 @@ export interface RuntimeServices {
   readonly camera: CameraService
 }
 
+export interface TimedRuntimeState<T> {
+  readonly track: T | null
+  readonly progress: number
+  readonly isActive: boolean
+}
+
+export type EffectRuntimeState = TimedRuntimeState<RuntimeEffect>
+export type DepthRuntimeState = TimedRuntimeState<RuntimeDepth>
+export type CompositionRuntimeState = TimedRuntimeState<RuntimeComposition>
+export type AudioRuntimeState = TimedRuntimeState<RuntimeAudio>
+
+export interface EffectService {
+  getEffects(): readonly RuntimeEffect[]
+  getCurrentEffect(timeMs: number): RuntimeEffect | null
+  getCurrentEffectState(timeMs: number): EffectRuntimeState
+}
+
+export interface DepthService {
+  getDepthTracks(): readonly RuntimeDepth[]
+  getCurrentDepth(timeMs: number): RuntimeDepth | null
+  getCurrentDepthState(timeMs: number): DepthRuntimeState
+}
+
+export interface CompositionService {
+  getCompositions(): readonly RuntimeComposition[]
+  getCurrentComposition(timeMs: number): RuntimeComposition | null
+  getCurrentCompositionState(timeMs: number): CompositionRuntimeState
+}
+
+export interface AudioService {
+  getAudioTracks(): readonly RuntimeAudio[]
+  getCurrentAudio(timeMs: number): RuntimeAudio | null
+  getCurrentAudioState(timeMs: number): AudioRuntimeState
+}
+
+export interface RuntimeDataV2Services extends RuntimeServices {
+  readonly effect: EffectService
+  readonly depth: DepthService
+  readonly composition: CompositionService
+  readonly audio: AudioService
+}
+
 export interface RuntimeServiceDependencies {
   readonly readers: RuntimeReaders
 }
@@ -98,4 +149,24 @@ export interface SubtitleServiceDependencies {
 
 export interface CameraServiceDependencies {
   readonly cameraReader: CameraReader
+}
+
+export interface EffectServiceDependencies {
+  readonly effectReader: EffectReader
+}
+
+export interface DepthServiceDependencies {
+  readonly depthReader: DepthReader
+}
+
+export interface CompositionServiceDependencies {
+  readonly compositionReader: CompositionReader
+}
+
+export interface AudioServiceDependencies {
+  readonly audioReader: AudioReader
+}
+
+export interface RuntimeDataV2ServiceDependencies {
+  readonly readers: RuntimeDataV2Readers
 }
