@@ -1,5 +1,12 @@
 import type { RuntimeReaders } from '../readers'
-import type { RuntimeValidationIssue } from '../validation'
+import type {
+  RuntimeValidationIssue,
+  ValidatedRuntimeDataV2,
+} from '../validation'
+
+export interface RuntimeDataV2Consumption {
+  readonly data: ValidatedRuntimeDataV2
+}
 
 export type CreateValidatedRuntimeReadersResult =
   | {

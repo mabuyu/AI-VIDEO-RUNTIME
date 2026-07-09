@@ -1,5 +1,8 @@
 export { adaptRuntimeData } from './adaptRuntimeData'
-export { createValidatedRuntimeReaders } from './consumption'
+export {
+  createRuntimeDataV2Consumption,
+  createValidatedRuntimeReaders,
+} from './consumption'
 export { loadStaticRuntimeData, loadStaticRuntimeDataV2 } from './loaders'
 export {
   createGeneratedRuntimeDataSource,
@@ -31,6 +34,7 @@ export {
 
 export type {
   CreateValidatedRuntimeReadersResult,
+  RuntimeDataV2Consumption,
 } from './consumption'
 
 export type {
@@ -63,6 +67,7 @@ export type {
   RuntimeValidationIssue,
   RuntimeValidationIssueCode,
   RuntimeValidationSeverity,
+  ValidatedRuntimeDataV2,
 } from './validation'
 
 export type {

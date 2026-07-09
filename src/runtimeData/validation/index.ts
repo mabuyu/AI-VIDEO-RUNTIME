@@ -18,4 +18,5 @@ export type {
   RuntimeValidationIssue,
   RuntimeValidationIssueCode,
   RuntimeValidationSeverity,
+  ValidatedRuntimeDataV2,
 } from './types'

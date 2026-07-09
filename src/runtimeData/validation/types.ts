@@ -1,5 +1,11 @@
 import type { RuntimeDataV1, RuntimeDataV2 } from '../types'
 
+declare const validatedRuntimeDataV2Brand: unique symbol
+
+export type ValidatedRuntimeDataV2 = RuntimeDataV2 & {
+  readonly [validatedRuntimeDataV2Brand]: true
+}
+
 export type RuntimeValidationSeverity = 'error' | 'warning'
 
 export type RuntimeValidationDomain =
@@ -110,7 +116,7 @@ export type RuntimeDataValidationResult =
 export type RuntimeDataV2ValidationResult =
   | {
       readonly ok: true
-      readonly data: RuntimeDataV2
+      readonly data: ValidatedRuntimeDataV2
       readonly issues: readonly RuntimeValidationIssue[]
     }
   | {

@@ -7,7 +7,11 @@ const server = await createServer({
 })
 
 try {
-  const { loadStaticRuntimeDataV2, validateRuntimeDataV2 } =
+  const {
+    createRuntimeDataV2Consumption,
+    loadStaticRuntimeDataV2,
+    validateRuntimeDataV2,
+  } =
     await server.ssrLoadModule('/src/runtimeData/index.ts')
 
   const candidate = loadStaticRuntimeDataV2()
@@ -18,9 +22,12 @@ try {
     console.error(JSON.stringify(result.issues, null, 2))
     process.exitCode = 1
   } else {
+    const consumption = createRuntimeDataV2Consumption(result.data)
+
     console.log('Static RuntimeDataV2 validation passed')
     console.log(`ok = ${result.ok}`)
     console.log(`issueCount = ${result.issues.length}`)
+    console.log(`consumptionAccepted = ${consumption.data === result.data}`)
   }
 } finally {
   await server.close()

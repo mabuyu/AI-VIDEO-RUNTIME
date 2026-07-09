@@ -1,8 +1,8 @@
-import type { RuntimeDataV2 } from '../types'
 import { createIssue, isFiniteNumber, isRecord } from './helpers'
 import type {
   RuntimeDataV2ValidationResult,
   RuntimeValidationIssue,
+  ValidatedRuntimeDataV2,
 } from './types'
 import { RUNTIME_VALIDATION_CODES } from './types'
 import { validateAudio } from './validateAudio'
@@ -304,7 +304,7 @@ export function validateRuntimeDataV2(runtimeData: unknown): RuntimeDataV2Valida
 
   return {
     ok: true,
-    data: runtimeData as unknown as RuntimeDataV2,
+    data: runtimeData as unknown as ValidatedRuntimeDataV2,
     issues,
   }
 }
