@@ -14,33 +14,14 @@ import {
   getExitStyle,
   getTransitionProgress,
 } from './utils/transition'
-import {
-  getCurrentEffect,
-  getEffectProgress,
-} from './utils/effectParser'
 import { getEffectPreset } from './utils/effectPresets'
-import { validateEffects } from './utils/effectValidator'
-import {
-  getCurrentAudio,
-  getAudioProgress,
-} from './utils/audioParser'
 import { getAudioPreset } from './utils/audioPresets'
-import {
-  getCurrentDepth,
-  getDepthProgress,
-} from './utils/depthParser'
 import { getDepthPreset } from './utils/depthPresets'
-import { validateDepths } from './utils/depthValidator'
 import {
   getParallaxOffset,
   getLayerScale,
 } from './utils/parallax'
-import {
-  getCurrentComposition,
-  getCompositionProgress,
-} from './utils/compositionParser'
 import { getCompositionPreset } from './utils/compositionPresets'
-import { validateCompositions } from './utils/compositionValidator'
 import {
   getAssetCount,
   getPreloadAssetCount,
@@ -73,22 +54,24 @@ import {
 
 import { validateAIPlan } from './utils/aiValidator'
 import {
-  createRuntimeBootstrap,
-  createRuntimeContext,
-  createRuntimeDebugSnapshot,
+  createRuntimeApplicationV2,
 } from './runtime'
-import type { RuntimeContext } from './runtime'
-import { createStaticRuntimeDataSource } from './runtimeData'
+import type {
+  RuntimeContextV2,
+  RuntimeDebugSnapshotV2,
+} from './runtime'
 
-const runtimeBootstrap = createRuntimeBootstrap(
-  createStaticRuntimeDataSource(),
-)
+const runtimeApplication = createRuntimeApplicationV2()
 
 interface RuntimeAppProps {
-  readonly runtimeContext: RuntimeContext
+  readonly runtimeContext: RuntimeContextV2
+  readonly runtimeDebugSnapshot: RuntimeDebugSnapshotV2
 }
 
-function RuntimeApp({ runtimeContext }: RuntimeAppProps) {
+function RuntimeApp({
+  runtimeContext,
+  runtimeDebugSnapshot,
+}: RuntimeAppProps) {
   const { services } = runtimeContext
   const FPS = services.playback.getTimelineFPS()
 
@@ -102,9 +85,6 @@ function RuntimeApp({ runtimeContext }: RuntimeAppProps) {
   const [isPlaying, setIsPlaying] = useState(true)
 
   useEffect(() => {
-    console.log('Effect Validation:', validateEffects())
-    console.log('Depth Validation:', validateDepths())
-    console.log('Composition Validation:', validateCompositions())
     console.log('Asset Validation:', validateAssets())
     console.log('Resource Validation:', validateResources())
     console.log('AI Validation:', validateAIPlan())
@@ -152,14 +132,18 @@ function RuntimeApp({ runtimeContext }: RuntimeAppProps) {
   }, [totalFrames])
 
   const currentTime = services.playback.frameToTimeMs(frame)
-  const debugSnapshot = createRuntimeDebugSnapshot(runtimeContext, currentTime)
   const currentSubtitle = services.subtitle.getCurrentSubtitle(currentTime)
   const cameraState = services.camera.getCurrentCameraState(currentTime)
   const currentCamera = cameraState.camera
-  const currentEffect = getCurrentEffect(currentTime)
-  const currentAudio = getCurrentAudio(currentTime)
-  const currentDepth = getCurrentDepth(currentTime)
-  const currentComposition = getCurrentComposition(currentTime)
+  const effectState = services.effect.getCurrentEffectState(currentTime)
+  const audioState = services.audio.getCurrentAudioState(currentTime)
+  const depthState = services.depth.getCurrentDepthState(currentTime)
+  const compositionState =
+    services.composition.getCurrentCompositionState(currentTime)
+  const currentEffect = effectState.track
+  const currentAudio = audioState.track
+  const currentDepth = depthState.track
+  const currentComposition = compositionState.track
 
   const assetCount = getAssetCount()
   const preloadAssetCount = getPreloadAssetCount()
@@ -184,25 +168,22 @@ function RuntimeApp({ runtimeContext }: RuntimeAppProps) {
   const aiSceneCount = getGeneratedSceneCount()
   const aiResourceCount = getGeneratedResourceCount()
   const aiSubtitleCount = getGeneratedSubtitleCount()
-  const effectProgress = getEffectProgress(currentTime, currentEffect)
+  const effectProgress = effectState.progress
   const effectPreset = currentEffect
     ? getEffectPreset(currentEffect.preset)
     : null
 
-  const audioProgress = getAudioProgress(currentTime, currentAudio)
+  const audioProgress = audioState.progress
   const audioPreset = currentAudio
     ? getAudioPreset(currentAudio.preset)
     : null
 
-  const depthProgress = getDepthProgress(currentTime, currentDepth)
+  const depthProgress = depthState.progress
   const depthPreset = currentDepth
     ? getDepthPreset(currentDepth.preset)
     : null
 
-  const compositionProgress = getCompositionProgress(
-    currentTime,
-    currentComposition
-  )
+  const compositionProgress = compositionState.progress
 
   const compositionPreset = currentComposition
     ? getCompositionPreset(currentComposition.preset)
@@ -239,16 +220,16 @@ function RuntimeApp({ runtimeContext }: RuntimeAppProps) {
         data-runtime-state='inactive'
       >
         <div className='debug-panel' role='status'>
-          <div>project title: {debugSnapshot.project.title}</div>
-          <div>fps: {debugSnapshot.fps}</div>
-          <div>duration: {debugSnapshot.duration}ms</div>
-          <div>frame: {debugSnapshot.frame}</div>
-          <div>time: {Math.floor(debugSnapshot.timeMs)}ms</div>
-          <div>scene: {debugSnapshot.scene.scene?.scene ?? 'none'}</div>
-          <div>scene index: {debugSnapshot.scene.index}</div>
-          <div>scene state: {debugSnapshot.scene.lifecycle}</div>
-          <div>subtitle: {debugSnapshot.subtitle.subtitle?.text ?? 'none'}</div>
-          <div>camera active: {debugSnapshot.camera.isActive ? 'yes' : 'no'}</div>
+          <div>project title: {runtimeDebugSnapshot.services.projectTitle}</div>
+          <div>fps: {runtimeDebugSnapshot.services.fps}</div>
+          <div>duration: {runtimeDebugSnapshot.services.duration}ms</div>
+          <div>frame: {frame}</div>
+          <div>time: {Math.floor(currentTime)}ms</div>
+          <div>scene: none</div>
+          <div>scene index: {currentIndex}</div>
+          <div>scene state: {currentSceneState.lifecycle}</div>
+          <div>subtitle: {currentSubtitle?.text ?? 'none'}</div>
+          <div>camera active: {cameraState.isActive ? 'yes' : 'no'}</div>
         </div>
       </div>
     )
@@ -347,33 +328,35 @@ function RuntimeApp({ runtimeContext }: RuntimeAppProps) {
       </DepthLayer>
 
       <div className="debug-panel">
-        <div>project title: {debugSnapshot.project.title}</div>
-        <div>project author: {debugSnapshot.project.author}</div>
-        <div>project version: {debugSnapshot.project.version}</div>
+        <div>runtime ready: {runtimeDebugSnapshot.readiness.ready ? 'yes' : 'no'}</div>
+        <div>runtime state: {runtimeDebugSnapshot.context.status}</div>
+        <div>project title: {projectConfig.title}</div>
+        <div>project author: {projectConfig.author}</div>
+        <div>project version: {projectConfig.version}</div>
         <div>
-          project resolution: {debugSnapshot.project.width} x{' '}
-          {debugSnapshot.project.height}
+          project resolution: {projectConfig.width} x{' '}
+          {projectConfig.height}
         </div>
-        <div>project duration: {debugSnapshot.project.duration}ms</div>
-        <div>fps: {debugSnapshot.fps}</div>
-        <div>timeline duration: {debugSnapshot.duration}ms</div>
+        <div>project duration: {projectConfig.duration}ms</div>
+        <div>fps: {runtimeDebugSnapshot.services.fps}</div>
+        <div>timeline duration: {runtimeDebugSnapshot.services.duration}ms</div>
 
-        <div>frame: {debugSnapshot.frame}</div>
-        <div>time: {Math.floor(debugSnapshot.timeMs)}ms</div>
-        <div>scene: {debugSnapshot.scene.scene?.scene ?? 'none'}</div>
-        <div>start: {debugSnapshot.scene.scene?.start ?? 0}ms</div>
-        <div>duration: {debugSnapshot.scene.scene?.duration ?? 0}ms</div>
-        <div>scene progress: {debugSnapshot.scene.progress.toFixed(2)}</div>
-        <div>scene state: {debugSnapshot.scene.lifecycle}</div>
+        <div>frame: {frame}</div>
+        <div>time: {Math.floor(currentTime)}ms</div>
+        <div>scene: {currentScene.scene}</div>
+        <div>start: {currentScene.start}ms</div>
+        <div>duration: {currentScene.duration}ms</div>
+        <div>scene progress: {sceneProgress.toFixed(2)}</div>
+        <div>scene state: {currentSceneState.lifecycle}</div>
         <div>transition progress: {transitionProgress.toFixed(2)}</div>
-        <div>global progress: {debugSnapshot.scene.globalProgress.toFixed(2)}</div>
+        <div>global progress: {globalProgress.toFixed(2)}</div>
 
         <div>camera scale: {cameraScale.toFixed(2)}</div>
         <div>camera x: {cameraX.toFixed(1)}</div>
         <div>camera y: {cameraY.toFixed(1)}</div>
-        <div>camera active: {debugSnapshot.camera.isActive ? 'yes' : 'no'}</div>
-        <div>camera id: {debugSnapshot.camera.camera?.id ?? 'none'}</div>
-        <div>camera progress: {debugSnapshot.camera.progress.toFixed(2)}</div>
+        <div>camera active: {cameraState.isActive ? 'yes' : 'no'}</div>
+        <div>camera id: {currentCamera?.id ?? 'none'}</div>
+        <div>camera progress: {cameraProgress.toFixed(2)}</div>
         <div>shake x: {shake.x.toFixed(2)}</div>
         <div>shake y: {shake.y.toFixed(2)}</div>
 
@@ -440,7 +423,7 @@ function RuntimeApp({ runtimeContext }: RuntimeAppProps) {
       <div>ai resources: {aiResourceCount}</div>
       <div>ai subtitles: {aiSubtitleCount}</div>
       <div>ai prompt: {aiPrompt}</div>
-        <div>subtitle: {debugSnapshot.subtitle.subtitle?.text ?? 'none'}</div>
+        <div>subtitle: {currentSubtitle?.text ?? 'none'}</div>
         <div>status: {isPlaying ? 'playing' : 'paused'}</div>
       </div>
 
@@ -492,14 +475,14 @@ function RuntimeApp({ runtimeContext }: RuntimeAppProps) {
       >
         <div style={{ filter: effectFilter }}>
           <SceneStatus
-            scene={debugSnapshot.scene.scene?.scene ?? 'none'}
-            state={debugSnapshot.scene.lifecycle}
-            index={debugSnapshot.scene.index}
-            sceneProgress={debugSnapshot.scene.progress}
-            globalProgress={debugSnapshot.scene.globalProgress}
+            scene={currentScene.scene}
+            state={currentSceneState.lifecycle}
+            index={currentIndex}
+            sceneProgress={sceneProgress}
+            globalProgress={globalProgress}
             transitionProgress={transitionProgress}
-            frame={debugSnapshot.frame}
-            time={debugSnapshot.timeMs}
+            frame={frame}
+            time={currentTime}
           />
 
           <Subtitle subtitle={currentSubtitle ?? undefined} />
@@ -532,13 +515,12 @@ function RuntimeApp({ runtimeContext }: RuntimeAppProps) {
 }
 
 function App() {
-  if (!runtimeBootstrap.ok) {
+  if (!runtimeApplication.ok) {
     return (
       <div className='video' data-runtime-state='bootstrap-error'>
         <div className='debug-panel' role='alert'>
-          <div>Runtime bootstrap failed.</div>
-          <div>source: {runtimeBootstrap.sourceKind}</div>
-          {runtimeBootstrap.issues.map((issue, index) => (
+          <div>Runtime application initialization failed.</div>
+          {runtimeApplication.issues.map((issue, index) => (
             <div key={`${issue.code}-${index}`}>
               {issue.code}: {issue.message}
             </div>
@@ -548,9 +530,12 @@ function App() {
     )
   }
 
-  const runtimeContext = createRuntimeContext(runtimeBootstrap)
-
-  return <RuntimeApp runtimeContext={runtimeContext} />
+  return (
+    <RuntimeApp
+      runtimeContext={runtimeApplication.context}
+      runtimeDebugSnapshot={runtimeApplication.debugSnapshot}
+    />
+  )
 }
 
 export default App

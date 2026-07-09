@@ -1,3 +1,4 @@
+export { createRuntimeApplicationV2 } from './application'
 export { createRuntimeBootstrap, createRuntimeBootstrapV2 } from './bootstrap'
 export { createRuntimeContext, createRuntimeContextV2 } from './context'
 export {
@@ -6,6 +7,7 @@ export {
 } from './debug'
 export { createRuntimeServices } from './services'
 
+export type { RuntimeApplicationV2 } from './application'
 export type { RuntimeBootstrapResult, RuntimeBootstrapV2 } from './bootstrap'
 export type {
   RuntimeContext,
