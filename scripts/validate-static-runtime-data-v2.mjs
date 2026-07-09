@@ -21,6 +21,8 @@ try {
     await server.ssrLoadModule('/src/runtime/services/index.ts')
   const { createRuntimeContextV2 } =
     await server.ssrLoadModule('/src/runtime/context/index.ts')
+  const { createRuntimeDebugSnapshotV2 } =
+    await server.ssrLoadModule('/src/runtime/debug/index.ts')
 
   const candidate = loadStaticRuntimeDataV2()
   const result = validateRuntimeDataV2(candidate)
@@ -39,6 +41,7 @@ try {
       readers,
       services,
     })
+    const debugSnapshot = createRuntimeDebugSnapshotV2(context)
 
     console.log('Static RuntimeDataV2 validation passed')
     console.log(`ok = ${result.ok}`)
@@ -53,6 +56,19 @@ try {
     console.log(`contextAcceptedBootstrap = ${context.bootstrap === bootstrap}`)
     console.log(`contextAcceptedReaders = ${context.readers === readers}`)
     console.log(`contextAcceptedServices = ${context.services === services}`)
+    console.log(
+      `debugSnapshotCreated = ${debugSnapshot.context.status === 'ready'}`,
+    )
+    console.log(`debugSnapshotReady = ${debugSnapshot.readiness.ready}`)
+    console.log(
+      `debugSnapshotBootstrapReady = ${debugSnapshot.bootstrap.ready}`,
+    )
+    console.log(
+      `debugSnapshotEffectCount = ${debugSnapshot.readers.effectCount}`,
+    )
+    console.log(
+      `debugSnapshotServiceCount = ${debugSnapshot.services.domainCount}`,
+    )
     console.log(
       `effectActiveAt0 = ${services.effect.getCurrentEffectState(0).isActive}`,
     )
