@@ -26,6 +26,7 @@ export {
 export {
   createCameraReader,
   createProjectReader,
+  createRuntimeDataV2Readers,
   createRuntimeReaders,
   createSceneReader,
   createSubtitleReader,
@@ -71,9 +72,18 @@ export type {
 } from './validation'
 
 export type {
+  AudioReader,
   CameraReader,
+  CompositionReader,
+  DepthReader,
+  EffectReader,
+  RuntimeAudio,
   ProjectReader,
   RuntimeCamera,
+  RuntimeComposition,
+  RuntimeDataV2Readers,
+  RuntimeDepth,
+  RuntimeEffect,
   RuntimeProject,
   RuntimeReaders,
   RuntimeScene,

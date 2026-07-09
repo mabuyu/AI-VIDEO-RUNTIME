@@ -1,4 +1,4 @@
-import type { RuntimeDataV1 } from '../types'
+import type { RuntimeDataV1, RuntimeDataV2 } from '../types'
 
 type RuntimeSceneSource = RuntimeDataV1['scenes'][number]
 type RuntimeTimelineSource = RuntimeDataV1['timeline']
@@ -18,6 +18,10 @@ export type RuntimeTimeline = Readonly<
 >
 export type RuntimeTimelineTrackType = RuntimeTimelineTrack['type']
 export type RuntimeCamera = Readonly<RuntimeDataV1['camera'][number]>
+export type RuntimeEffect = Readonly<RuntimeDataV2['effect'][number]>
+export type RuntimeDepth = Readonly<RuntimeDataV2['depth'][number]>
+export type RuntimeComposition = Readonly<RuntimeDataV2['composition'][number]>
+export type RuntimeAudio = Readonly<RuntimeDataV2['audio'][number]>
 
 export interface ProjectReader {
   getProjectConfig(): RuntimeProject
@@ -55,10 +59,37 @@ export interface CameraReader {
   getCurrentCamera(timeMs: number): RuntimeCamera | null
 }
 
+export interface EffectReader {
+  getEffects(): readonly RuntimeEffect[]
+  getCurrentEffect(timeMs: number): RuntimeEffect | null
+}
+
+export interface DepthReader {
+  getDepthTracks(): readonly RuntimeDepth[]
+  getCurrentDepth(timeMs: number): RuntimeDepth | null
+}
+
+export interface CompositionReader {
+  getCompositions(): readonly RuntimeComposition[]
+  getCurrentComposition(timeMs: number): RuntimeComposition | null
+}
+
+export interface AudioReader {
+  getAudioTracks(): readonly RuntimeAudio[]
+  getCurrentAudio(timeMs: number): RuntimeAudio | null
+}
+
 export interface RuntimeReaders {
   project: ProjectReader
   scene: SceneReader
   subtitle: SubtitleReader
   timeline: TimelineReader
   camera: CameraReader
+}
+
+export interface RuntimeDataV2Readers extends RuntimeReaders {
+  effect: EffectReader
+  depth: DepthReader
+  composition: CompositionReader
+  audio: AudioReader
 }

@@ -9,6 +9,7 @@ const server = await createServer({
 try {
   const {
     createRuntimeDataV2Consumption,
+    createRuntimeDataV2Readers,
     loadStaticRuntimeDataV2,
     validateRuntimeDataV2,
   } =
@@ -26,6 +27,7 @@ try {
   } else {
     const consumption = createRuntimeDataV2Consumption(result.data)
     const bootstrap = bootstrapRuntimeDataV2(consumption)
+    const readers = createRuntimeDataV2Readers(bootstrap)
 
     console.log('Static RuntimeDataV2 validation passed')
     console.log(`ok = ${result.ok}`)
@@ -33,6 +35,8 @@ try {
     console.log(`consumptionAccepted = ${consumption.data === result.data}`)
     console.log(`bootstrapReady = ${bootstrap.ready}`)
     console.log(`bootstrapAccepted = ${bootstrap.consumption === consumption}`)
+    console.log(`readersCreated = ${readers.effect.getEffects().length > 0}`)
+    console.log(`effectAt5700 = ${readers.effect.getCurrentEffect(5700)}`)
   }
 } finally {
   await server.close()
