@@ -1,10 +1,15 @@
 export { createRuntimeBootstrap, createRuntimeBootstrapV2 } from './bootstrap'
-export { createRuntimeContext } from './context'
+export { createRuntimeContext, createRuntimeContextV2 } from './context'
 export { createRuntimeDebugSnapshot } from './debug'
 export { createRuntimeServices } from './services'
 
 export type { RuntimeBootstrapResult, RuntimeBootstrapV2 } from './bootstrap'
-export type { RuntimeContext } from './context'
+export type {
+  RuntimeContext,
+  RuntimeContextV2,
+  RuntimeContextV2Dependencies,
+  RuntimeStateV2,
+} from './context'
 export type {
   RuntimeDebugProjectMetadata,
   RuntimeDebugSceneState,

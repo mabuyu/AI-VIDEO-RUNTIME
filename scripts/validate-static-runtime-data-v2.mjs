@@ -19,6 +19,8 @@ try {
 
   const { createRuntimeDataV2Services } =
     await server.ssrLoadModule('/src/runtime/services/index.ts')
+  const { createRuntimeContextV2 } =
+    await server.ssrLoadModule('/src/runtime/context/index.ts')
 
   const candidate = loadStaticRuntimeDataV2()
   const result = validateRuntimeDataV2(candidate)
@@ -32,6 +34,11 @@ try {
     const bootstrap = bootstrapRuntimeDataV2(consumption)
     const readers = createRuntimeDataV2Readers(bootstrap)
     const services = createRuntimeDataV2Services(readers)
+    const context = createRuntimeContextV2({
+      bootstrap,
+      readers,
+      services,
+    })
 
     console.log('Static RuntimeDataV2 validation passed')
     console.log(`ok = ${result.ok}`)
@@ -41,6 +48,11 @@ try {
     console.log(`bootstrapAccepted = ${bootstrap.consumption === consumption}`)
     console.log(`readersCreated = ${readers.effect.getEffects().length > 0}`)
     console.log(`servicesCreated = ${services.effect.getEffects().length > 0}`)
+    console.log(`contextCreated = ${context.state.status === 'ready'}`)
+    console.log(`contextReady = ${context.readiness.ready}`)
+    console.log(`contextAcceptedBootstrap = ${context.bootstrap === bootstrap}`)
+    console.log(`contextAcceptedReaders = ${context.readers === readers}`)
+    console.log(`contextAcceptedServices = ${context.services === services}`)
     console.log(
       `effectActiveAt0 = ${services.effect.getCurrentEffectState(0).isActive}`,
     )
