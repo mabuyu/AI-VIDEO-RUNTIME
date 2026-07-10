@@ -3,7 +3,11 @@ export {
   createRuntimeDataV2Consumption,
   createValidatedRuntimeReaders,
 } from './consumption'
-export { loadStaticRuntimeData, loadStaticRuntimeDataV2 } from './loaders'
+export {
+  loadGeneratedRuntimeDataV2,
+  loadStaticRuntimeData,
+  loadStaticRuntimeDataV2,
+} from './loaders'
 export {
   createGeneratedRuntimeDataSource,
   createStaticRuntimeDataSource,
@@ -37,6 +41,8 @@ export type {
   CreateValidatedRuntimeReadersResult,
   RuntimeDataV2Consumption,
 } from './consumption'
+
+export type { GeneratedRuntimeDataV2Artifact } from './loaders'
 
 export type {
   RuntimeDataAdapterDiagnostic,
