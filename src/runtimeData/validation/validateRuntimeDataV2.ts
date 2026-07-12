@@ -11,8 +11,6 @@ import { validateDepth } from './validateDepth'
 import { validateEffect } from './validateEffect'
 import { validateRuntimeData } from './validateRuntimeData'
 
-const TIMELINE_DURATION_AUTHORITY_MS = 5700
-
 const REQUIRED_V2_DOMAINS = ['effect', 'depth', 'composition', 'audio'] as const
 
 const REQUIRED_V2_TRACKS = [
@@ -222,20 +220,6 @@ function addV2CrossDomainIssues(
   addRequiredV2TrackIssues(timeline, issues)
 
   if (!isFiniteNumber(timeline.duration)) return
-
-  if (timeline.duration !== TIMELINE_DURATION_AUTHORITY_MS) {
-    issues.push(
-      createIssue({
-        severity: 'error',
-        code: RUNTIME_VALIDATION_CODES.timelineDurationAuthorityMismatch,
-        domain: 'runtimeData',
-        path: 'timeline.duration',
-        message: 'timeline.duration must match the RuntimeDataV2 5700ms authority rule',
-        expected: TIMELINE_DURATION_AUTHORITY_MS,
-        actual: timeline.duration,
-      }),
-    )
-  }
 
   for (const domain of REQUIRED_V2_DOMAINS) {
     const value = runtimeData[domain]
