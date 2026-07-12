@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "validate:runtime-data-v2:static": "node scripts/validate-static-runtime-data-v2.mjs"
+    "validate:runtime-data-v2:static": "node scripts/validate-static-runtime-data-v2.mjs",
+    "validate:runtime-data-source-v2": "node scripts/validate-runtime-data-source-v2.mjs"
   },
   "dependencies": {
     "react": "^19.2.6",

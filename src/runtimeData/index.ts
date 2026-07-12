@@ -12,6 +12,7 @@ export {
   createGeneratedRuntimeDataSource,
   createStaticRuntimeDataSource,
   resolveRuntimeDataSource,
+  resolveRuntimeDataSourceV2,
 } from './sources'
 export {
   RUNTIME_VALIDATION_CODES,
@@ -65,6 +66,10 @@ export type {
   RuntimeDataSource,
   RuntimeDataSourceKind,
   StaticRuntimeDataSource,
+  GeneratedRuntimeDataV2Source,
+  RemoteRuntimeDataV2Source,
+  RuntimeDataSourceV2,
+  StaticRuntimeDataV2Source,
 } from './sources'
 
 export type {
