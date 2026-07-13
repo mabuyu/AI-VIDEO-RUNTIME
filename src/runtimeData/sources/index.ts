@@ -1,7 +1,10 @@
 export { createGeneratedRuntimeDataSource } from './createGeneratedRuntimeDataSource'
 export { createStaticRuntimeDataSource } from './createStaticRuntimeDataSource'
 export { resolveRuntimeDataSource } from './resolveRuntimeDataSource'
-export { resolveRuntimeDataSourceV2 } from './v2'
+export {
+  createGeneratedRuntimeDataV2Source,
+  resolveRuntimeDataSourceV2,
+} from './v2'
 
 export type {
   GeneratedRuntimeDataSource,

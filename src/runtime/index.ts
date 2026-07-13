@@ -1,4 +1,4 @@
-export { createRuntimeApplicationV2 } from './application'
+export { createGeneratedRuntimeApplicationV2 as createRuntimeApplicationV2 } from './application'
 export { createRuntimeBootstrap, createRuntimeBootstrapV2 } from './bootstrap'
 export { createRuntimeContext, createRuntimeContextV2 } from './context'
 export {

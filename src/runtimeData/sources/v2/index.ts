@@ -1,3 +1,4 @@
+export { createGeneratedRuntimeDataV2Source } from './createGeneratedRuntimeDataV2Source'
 export { resolveRuntimeDataSourceV2 } from './resolveRuntimeDataSourceV2'
 export type {
   GeneratedRuntimeDataV2Source,

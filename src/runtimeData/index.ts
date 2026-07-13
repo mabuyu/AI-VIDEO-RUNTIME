@@ -9,6 +9,7 @@ export {
   loadStaticRuntimeDataV2,
 } from './loaders'
 export {
+  createGeneratedRuntimeDataV2Source,
   createGeneratedRuntimeDataSource,
   createStaticRuntimeDataSource,
   resolveRuntimeDataSource,
