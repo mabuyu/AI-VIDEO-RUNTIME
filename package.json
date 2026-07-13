@@ -12,6 +12,7 @@
     "validate:generated-runtime-data-v2:activation": "node scripts/validate-generated-runtime-data-v2-activation.mjs",
     "validate:runtime-application-v2:source-injection": "node scripts/validate-runtime-application-v2-source-injection.mjs",
     "validate:runtime-data-v2:dual-source": "node scripts/validate-runtime-data-v2-dual-source.mjs",
+    "validate:runtime-data-v2:failure-boundary": "node scripts/validate-runtime-data-v2-failure-boundary.mjs",
     "validate:runtime-data-source-v2": "node scripts/validate-runtime-data-source-v2.mjs"
   },
   "dependencies": {
