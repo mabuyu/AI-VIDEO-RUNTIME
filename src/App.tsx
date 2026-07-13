@@ -15,7 +15,6 @@ import {
   getTransitionProgress,
 } from './utils/transition'
 import { getEffectPreset } from './utils/effectPresets'
-import { getAudioPreset } from './utils/audioPresets'
 import { getDepthPreset } from './utils/depthPresets'
 import {
   getParallaxOffset,
@@ -174,9 +173,6 @@ function RuntimeApp({
     : null
 
   const audioProgress = audioState.progress
-  const audioPreset = currentAudio
-    ? getAudioPreset(currentAudio.preset)
-    : null
 
   const depthProgress = depthState.progress
   const depthPreset = currentDepth
@@ -189,19 +185,7 @@ function RuntimeApp({
     ? getCompositionPreset(currentComposition.preset)
     : null
 
-  let audioGain = 1
-
-  if (audioPreset && currentAudio) {
-    audioGain = audioPreset.volume
-
-    if (audioPreset.fadeIn > 0 && audioProgress < audioPreset.fadeIn) {
-      audioGain *= audioProgress / audioPreset.fadeIn
-    }
-
-    if (audioPreset.fadeOut > 0 && audioProgress > 1 - audioPreset.fadeOut) {
-      audioGain *= (1 - audioProgress) / audioPreset.fadeOut
-    }
-  }
+  const audioGain = currentAudio?.volume ?? 0
 
   const cameraProgress = cameraState.progress
 
@@ -371,11 +355,10 @@ function RuntimeApp({
         <div>contrast: {effectPreset?.contrast ?? 1}</div>
         <div>saturation: {effectPreset?.saturation ?? 1}</div>
 
-        <div>audio preset: {currentAudio?.preset ?? 'none'}</div>
+        <div>audio type: {currentAudio?.type ?? 'none'}</div>
         <div>audio progress: {audioProgress.toFixed(2)}</div>
-        <div>volume: {audioPreset?.volume ?? 0}</div>
-        <div>fadeIn: {audioPreset?.fadeIn ?? 0}</div>
-        <div>fadeOut: {audioPreset?.fadeOut ?? 0}</div>
+        <div>volume: {currentAudio?.volume ?? 0}</div>
+        <div>segments: {currentAudio?.segments.length ?? 0}</div>
         <div>audio gain: {audioGain.toFixed(2)}</div>
 
         <div>depth preset: {currentDepth?.preset ?? 'none'}</div>

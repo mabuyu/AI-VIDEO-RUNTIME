@@ -18,8 +18,6 @@ export interface RuntimeDataV1 {
 export type RuntimeEffectPreset = 'cinematic' | 'dramatic' | 'clean' | 'dream'
 export type RuntimeDepthPreset = 'near' | 'balanced' | 'deep' | 'cinematic'
 export type RuntimeCompositionPreset = 'hook' | 'problem' | 'value' | 'contrast'
-export type RuntimeAudioPreset = 'impact' | 'dramatic' | 'clean' | 'cinematic'
-
 export interface RuntimeEffectTrack {
   readonly id: string
   readonly start: number
@@ -41,12 +39,38 @@ export interface RuntimeCompositionTrack {
   readonly preset: RuntimeCompositionPreset
 }
 
-export interface RuntimeAudioTrack {
+export interface RuntimeGeneratedAudioSegment {
+  readonly start: number
+  readonly duration: number
+  readonly audioRef: string
+}
+
+export interface RuntimeSilenceAudioSegment {
+  readonly start: number
+  readonly duration: number
+}
+
+interface RuntimeAudioTrackBase {
   readonly id: string
   readonly start: number
   readonly duration: number
-  readonly preset: RuntimeAudioPreset
 }
+
+export interface RuntimeGeneratedAudioTrack extends RuntimeAudioTrackBase {
+  readonly type: 'generated-audio'
+  readonly volume: number
+  readonly segments: readonly RuntimeGeneratedAudioSegment[]
+}
+
+export interface RuntimeSilenceAudioTrack extends RuntimeAudioTrackBase {
+  readonly type: 'silence'
+  readonly volume: 0
+  readonly segments: readonly RuntimeSilenceAudioSegment[]
+}
+
+export type RuntimeAudioTrack =
+  | RuntimeGeneratedAudioTrack
+  | RuntimeSilenceAudioTrack
 
 export interface RuntimeDataV2 extends RuntimeDataV1 {
   readonly effect: readonly RuntimeEffectTrack[]

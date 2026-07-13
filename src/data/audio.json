@@ -1,26 +1,34 @@
 [
   {
     "id": "audio-hook",
+    "type": "silence",
     "start": 0,
     "duration": 1200,
-    "preset": "impact"
+    "volume": 0,
+    "segments": [{ "start": 0, "duration": 1200 }]
   },
   {
     "id": "audio-problem",
+    "type": "silence",
     "start": 1200,
     "duration": 1500,
-    "preset": "dramatic"
+    "volume": 0,
+    "segments": [{ "start": 1200, "duration": 1500 }]
   },
   {
     "id": "audio-value",
+    "type": "silence",
     "start": 2700,
     "duration": 1500,
-    "preset": "clean"
+    "volume": 0,
+    "segments": [{ "start": 2700, "duration": 1500 }]
   },
   {
     "id": "audio-contrast",
+    "type": "silence",
     "start": 4200,
     "duration": 1500,
-    "preset": "cinematic"
+    "volume": 0,
+    "segments": [{ "start": 4200, "duration": 1500 }]
   }
 ]

@@ -1,14 +1,10 @@
 import audios from '../data/audio.json'
+import type { RuntimeAudioTrack } from '../runtimeData/types'
 
-export interface Audio {
-  id: string
-  start: number
-  duration: number
-  preset: string
-}
+export type Audio = RuntimeAudioTrack
 
-export function getAudios(): Audio[] {
-  return audios as Audio[]
+export function getAudios(): readonly Audio[] {
+  return audios as RuntimeAudioTrack[]
 }
 
 export function getCurrentAudio(
