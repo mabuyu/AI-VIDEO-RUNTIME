@@ -14,6 +14,7 @@
     "validate:runtime-data-v2:dual-source": "node scripts/validate-runtime-data-v2-dual-source.mjs",
     "validate:runtime-data-v2:failure-boundary": "node scripts/validate-runtime-data-v2-failure-boundary.mjs",
     "validate:runtime-data-v2:audio-contract": "node scripts/validate-runtime-data-v2-audio-contract.mjs",
+    "validate:compiler-adapter-v2": "node scripts/validate-compiler-adapter-v2.mjs",
     "validate:runtime-data-source-v2": "node scripts/validate-runtime-data-source-v2.mjs"
   },
   "dependencies": {

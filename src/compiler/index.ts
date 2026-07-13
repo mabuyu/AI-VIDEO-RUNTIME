@@ -22,6 +22,8 @@ export function compile(input: CompilerInput): CompilerOutput {
   }
 }
 
+export * from './runtimeDataV2'
+
 export type {
   CompiledCameraTrack,
   CompiledTimeline,
