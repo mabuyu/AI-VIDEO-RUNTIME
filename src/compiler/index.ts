@@ -23,6 +23,7 @@ export function compile(input: CompilerInput): CompilerOutput {
 }
 
 export * from './runtimeDataV2'
+export * from './artifact'
 
 export type {
   CompiledCameraTrack,
