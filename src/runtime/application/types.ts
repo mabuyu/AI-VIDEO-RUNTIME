@@ -1,6 +1,11 @@
 import type { RuntimeValidationIssue } from '../../runtimeData'
+import type { RuntimeDataSourceV2 } from '../../runtimeData'
 import type { RuntimeContextV2 } from '../context'
 import type { RuntimeDebugSnapshotV2 } from '../debug'
+
+export interface RuntimeApplicationOptions {
+  readonly source: RuntimeDataSourceV2
+}
 
 export type RuntimeApplicationV2 =
   | {

@@ -44,7 +44,13 @@ try {
       services,
     })
     const debugSnapshot = createRuntimeDebugSnapshotV2(context)
-    const application = createRuntimeApplicationV2()
+    const application = createRuntimeApplicationV2({
+      source: {
+        type: 'static',
+        sourceId: 'static-runtime-data-v2',
+        revision: 'milestone-2a-task-a1',
+      },
+    })
 
     console.log('Static RuntimeDataV2 validation passed')
     console.log(`ok = ${result.ok}`)

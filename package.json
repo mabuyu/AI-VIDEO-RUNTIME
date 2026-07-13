@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "validate:runtime-data-v2:static": "node scripts/validate-static-runtime-data-v2.mjs",
+    "validate:runtime-application-v2:source-injection": "node scripts/validate-runtime-application-v2-source-injection.mjs",
     "validate:runtime-data-source-v2": "node scripts/validate-runtime-data-source-v2.mjs"
   },
   "dependencies": {

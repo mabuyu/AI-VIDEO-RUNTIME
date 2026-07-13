@@ -7,7 +7,7 @@ export {
 } from './debug'
 export { createRuntimeServices } from './services'
 
-export type { RuntimeApplicationV2 } from './application'
+export type { RuntimeApplicationOptions, RuntimeApplicationV2 } from './application'
 export type { RuntimeBootstrapResult, RuntimeBootstrapV2 } from './bootstrap'
 export type {
   RuntimeContext,
