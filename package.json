@@ -17,7 +17,8 @@
     "validate:compiler-adapter-v2": "node scripts/validate-compiler-adapter-v2.mjs",
     "validate:compiler-artifact-packaging": "node scripts/validate-compiler-artifact-packaging.mjs",
     "validate:prompt-compiler-input-adapter": "node scripts/validate-prompt-compiler-input-adapter.mjs",
-    "validate:runtime-data-source-v2": "node scripts/validate-runtime-data-source-v2.mjs"
+    "validate:runtime-data-source-v2": "node scripts/validate-runtime-data-source-v2.mjs",
+    "validate:first-prompt-generated-video-mvp": "node scripts/validate-first-prompt-generated-video-mvp.mjs"
   },
   "dependencies": {
     "react": "^19.2.6",
