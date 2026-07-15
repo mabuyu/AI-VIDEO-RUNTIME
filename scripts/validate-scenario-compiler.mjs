@@ -34,25 +34,28 @@ try {
     audio: ['scene', 'timeline'],
   }
 
-  function producers(overrides = {}) {
+  function producers(overrides = {}, expectedInput = input) {
     const calls = []
+    const producedGenerationIds = []
     const ports = {}
     for (const domain of ['scene', 'timeline', 'camera', 'effect', 'composition', 'depth', 'audio']) {
       ports[domain] = {
         produce(producerInput) {
           calls.push(domain)
-          assert.equal(producerInput.selectedScenarioTemplate, input.selectedScenarioTemplate)
-          assert.equal(producerInput.compilerInputCandidate, input.compilerInputCandidate)
-          assert.equal(producerInput.planningContext, input.planningContext)
+          assert.equal(producerInput.selectedScenarioTemplate, expectedInput.selectedScenarioTemplate)
+          assert.equal(producerInput.compilerInputCandidate, expectedInput.compilerInputCandidate)
+          assert.equal(producerInput.planningContext, expectedInput.planningContext)
           const actualDependencies = Object.keys(producerInput)
             .filter((key) => !['selectedScenarioTemplate', 'compilerInputCandidate', 'planningContext'].includes(key))
             .sort()
           assert.deepEqual(actualDependencies, dependencyKeys[domain])
-          return overrides[domain] ?? { success: true, generationId, output: outputs[domain] }
+          const result = overrides[domain] ?? { success: true, generationId, output: outputs[domain] }
+          if (result.success) producedGenerationIds.push(result.generationId)
+          return result
         },
       }
     }
-    return { ports, calls }
+    return { ports, calls, producedGenerationIds }
   }
 
   const successful = producers()
@@ -61,6 +64,9 @@ try {
   assert.deepEqual(successful.calls, ['scene', 'timeline', 'camera', 'effect', 'composition', 'depth', 'audio'])
   assert.deepEqual(Object.keys(success.output), ['scene', 'timeline', 'camera', 'effect', 'depth', 'composition', 'audio'])
   for (const domain of Object.keys(outputs)) assert.equal(success.output[domain], outputs[domain])
+
+  assert.equal(successful.producedGenerationIds.length, 7)
+  assert.deepEqual([...new Set(successful.producedGenerationIds)], [generationId])
 
   const deterministic = producers()
   const repeated = compileScenario(input, deterministic.ports)
@@ -107,6 +113,22 @@ try {
   assert.equal(missingGenerationFailure.success, false)
   assert.equal('output' in missingGenerationFailure, false)
   assert.deepEqual(missingGenerationId.calls, ['scene'])
+  assert.deepEqual(missingGenerationFailure.issues, [{
+    code: 'INCOMPATIBLE_PLANNING_CONTEXT',
+    message: 'scene producer received no generationId; expected "generation-b8-2"',
+    domain: 'scene',
+    path: 'generationId',
+  }])
+
+  const changedPlanningContextInput = {
+    ...input,
+    planningContext: { ...input.planningContext, generationId: 'planning-context-run' },
+  }
+  const planningContextMismatch = producers({}, changedPlanningContextInput)
+  const planningContextFailure = compileScenario(changedPlanningContextInput, planningContextMismatch.ports)
+  assert.equal(planningContextFailure.success, false)
+  assert.equal('output' in planningContextFailure, false)
+  assert.deepEqual(planningContextMismatch.calls, ['scene'])
 
   console.log('Scenario Compiler verification passed')
 } finally {

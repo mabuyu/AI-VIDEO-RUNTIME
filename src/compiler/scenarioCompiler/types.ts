@@ -37,8 +37,12 @@ export interface DomainProducerIssue {
 }
 
 export type ProducerResult<TOutput> =
-  | { readonly success: true; readonly output: TOutput }
-  | { readonly success: false; readonly issues: readonly DomainProducerIssue[] }
+  | { readonly success: true; readonly generationId: string; readonly output: TOutput }
+  | {
+      readonly success: false
+      readonly issues: readonly DomainProducerIssue[]
+      readonly generationId?: string
+    }
 
 export interface SceneDomainOutput {
   readonly project: SemanticProject

@@ -10,10 +10,6 @@ import type {
 
 type ScenarioCompilerFailure = Extract<ScenarioCompilerResult, { readonly success: false }>
 
-type CorrelatedProducerResult<TOutput> = ProducerResult<TOutput> & {
-  readonly generationId?: unknown
-}
-
 const baseProducerInput = (input: ScenarioCompilerInput) => ({
   selectedScenarioTemplate: input.selectedScenarioTemplate,
   compilerInputCandidate: input.compilerInputCandidate,
@@ -44,7 +40,7 @@ function producerFailure(
 function generationFailure(
   domain: ScenarioCompilerDomain,
   expectedGenerationId: string,
-  actualGenerationId: unknown,
+  actualGenerationId: string | undefined,
 ): ScenarioCompilerFailure {
   const actual = typeof actualGenerationId === 'string'
     ? `received "${actualGenerationId}"`
@@ -64,7 +60,7 @@ function generationFailure(
 function acceptProducerResult<TOutput>(
   domain: ScenarioCompilerDomain,
   expectedGenerationId: string,
-  result: CorrelatedProducerResult<TOutput>,
+  result: ProducerResult<TOutput>,
 ): { readonly success: true; readonly output: TOutput } | ScenarioCompilerFailure {
   if (!result.success) {
     return producerFailure(domain, result.issues)
