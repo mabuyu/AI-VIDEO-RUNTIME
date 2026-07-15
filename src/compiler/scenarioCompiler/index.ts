@@ -1,3 +1,5 @@
+export { compileScenario } from './compileScenario'
+
 export type {
   AudioDomainOutput,
   AudioDomainTrack,
