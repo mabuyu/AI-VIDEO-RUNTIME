@@ -76,6 +76,9 @@ export function adaptCompilerOutputToRuntimeDataV2(input: unknown): CompilerAdap
       issues.push(issue('MISSING_DOMAIN', `${domain} domain is required`, domain))
     }
   }
+  if (typeof input.generationId !== 'string' || input.generationId.length === 0) {
+    issues.push(issue('MISSING_GENERATION_ID', 'generationId is required', 'generationId'))
+  }
   if (issues.length > 0) return { success: false, issues }
 
   if (!isRecord(input.project)) issues.push(issue('INVALID_DOMAIN_OUTPUT', 'project must be an object', 'project'))

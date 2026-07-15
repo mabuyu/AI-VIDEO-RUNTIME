@@ -13,6 +13,7 @@ import type {
   RuntimeDepthTrack,
   RuntimeEffectTrack,
 } from '../../runtimeData/types'
+import type { CompilerDomainOutputBundle } from '../scenarioCompiler'
 
 export type CompilerProducerDomain = 'effect' | 'depth' | 'composition' | 'audio'
 
@@ -73,6 +74,7 @@ export interface CompilerArtifactOutput {
 }
 
 export interface RuntimeDataV2CompilerAdapterInput {
+  readonly generationId: string
   readonly project: SemanticProject
   readonly scenes: readonly SemanticScene[]
   readonly subtitles: readonly SemanticSubtitle[]
@@ -82,6 +84,15 @@ export interface RuntimeDataV2CompilerAdapterInput {
   readonly depth: ProducerResult<DepthDomainOutput>
   readonly composition: ProducerResult<CompositionDomainOutput>
   readonly audio: ProducerResult<AudioDomainOutput>
+  readonly artifact: CompilerArtifactIdentity
+  readonly compatibility: CompilerArtifactCompatibility
+  readonly generation: CompilerGenerationMetadata
+  readonly diagnostics: readonly CompilerDiagnostic[]
+}
+
+export interface ScenarioCompilerAdapterHandoffInput {
+  readonly generationId: string
+  readonly bundle: CompilerDomainOutputBundle
   readonly artifact: CompilerArtifactIdentity
   readonly compatibility: CompilerArtifactCompatibility
   readonly generation: CompilerGenerationMetadata

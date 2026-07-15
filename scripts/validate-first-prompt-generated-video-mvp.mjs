@@ -26,6 +26,7 @@ try {
     },
   }
   const metadata = {
+    generationId: 'generation-mvp-a4',
     artifact: { id: 'mvp-nova-product-promo', revision: '1', createdAt: '2026-07-14T00:00:00.000Z' },
     compatibility: { schemaVersion: '1', runtimeSchemaVersion: '2' },
     generation: { compilerVersion: 'mvp-scenario-1.0.0', promptContractVersion: '1', generatedAt: '2026-07-14T00:00:00.000Z' },

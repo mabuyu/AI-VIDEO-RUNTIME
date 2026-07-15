@@ -28,6 +28,7 @@ export type MvpScenarioCompilerResult =
   | { readonly success: false; readonly issues: readonly MvpScenarioCompilerIssue[] }
 
 export interface MvpScenarioArtifactMetadata {
+  readonly generationId: RuntimeDataV2CompilerAdapterInput['generationId']
   readonly artifact: RuntimeDataV2CompilerAdapterInput['artifact']
   readonly compatibility: RuntimeDataV2CompilerAdapterInput['compatibility']
   readonly generation: RuntimeDataV2CompilerAdapterInput['generation']

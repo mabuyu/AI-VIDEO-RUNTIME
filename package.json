@@ -21,7 +21,8 @@
     "validate:first-prompt-generated-video-mvp": "node scripts/validate-first-prompt-generated-video-mvp.mjs",
     "validate:scenario-template-registry": "node scripts/validate-scenario-template-registry.mjs",
     "validate:scenario-template-selector": "node scripts/validate-scenario-template-selector.mjs",
-    "validate:scenario-compiler": "node scripts/validate-scenario-compiler.mjs"
+    "validate:scenario-compiler": "node scripts/validate-scenario-compiler.mjs",
+    "validate:scenario-compiler-handoff": "node scripts/validate-scenario-compiler-handoff.mjs"
   },
   "dependencies": {
     "react": "^19.2.6",

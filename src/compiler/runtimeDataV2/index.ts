@@ -1,4 +1,5 @@
 export { adaptCompilerOutputToRuntimeDataV2 } from './adaptCompilerOutputToRuntimeDataV2'
+export { adaptScenarioCompilerBundle } from './adaptScenarioCompilerBundle'
 export { createCompilerArtifactOutput } from './createCompilerArtifactOutput'
 export type {
   AudioDomainOutput,
@@ -16,4 +17,5 @@ export type {
   EffectDomainOutput,
   ProducerResult,
   RuntimeDataV2CompilerAdapterInput,
+  ScenarioCompilerAdapterHandoffInput,
 } from './types'

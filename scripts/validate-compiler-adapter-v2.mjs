@@ -8,6 +8,7 @@ try {
   const duration = 1000
   const success = (tracks, extra = {}) => ({ success: true, value: { tracks, ...extra }, issues: [] })
   const base = {
+    generationId: 'generation-adapter-v2',
     project: { title: 'Generated', author: 'Compiler', version: '2', fps: 30, width: 1080, height: 1920, duration, background: '#000' },
     scenes: [{ scene: 'hook', start: 0, duration, text: 'x', highlight: 'x', background: '#000', position: 'center', animation: 'none', camera: { scaleFrom: 1, scaleTo: 1, xFrom: 0, xTo: 0, yFrom: 0, yTo: 0, shake: 0 } }],
     subtitles: [{ id: 'subtitle-1', start: 0, duration, text: 'x' }],
