@@ -185,6 +185,7 @@ export interface ScenarioCompilerProducerPorts {
 }
 
 export interface CompilerDomainOutputBundle {
+  readonly generationId: string
   readonly scene: SceneDomainOutput
   readonly timeline: TimelineDomainOutput
   readonly camera: CameraDomainOutput

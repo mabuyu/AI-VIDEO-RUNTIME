@@ -57,6 +57,30 @@ function generationFailure(
   }
 }
 
+function missingProducerPort(domain: ScenarioCompilerDomain): ScenarioCompilerFailure {
+  return {
+    success: false,
+    issues: [{
+      code: 'INVALID_COMPILER_INPUT',
+      message: `${domain} producer port is required`,
+      domain,
+      path: `producers.${domain}`,
+    }],
+  }
+}
+
+function incompleteOutput(domain: ScenarioCompilerDomain): ScenarioCompilerFailure {
+  return {
+    success: false,
+    issues: [{
+      code: 'INCOMPLETE_DOMAIN_OUTPUT',
+      message: `${domain} producer succeeded without output`,
+      domain,
+      path: 'output',
+    }],
+  }
+}
+
 function acceptProducerResult<TOutput>(
   domain: ScenarioCompilerDomain,
   expectedGenerationId: string,
@@ -70,6 +94,10 @@ function acceptProducerResult<TOutput>(
     return generationFailure(domain, expectedGenerationId, result.generationId)
   }
 
+  if (result.output === undefined || result.output === null) {
+    return incompleteOutput(domain)
+  }
+
   return { success: true, output: result.output }
 }
 
@@ -77,6 +105,21 @@ export function compileScenario(
   input: ScenarioCompilerInput,
   producers: ScenarioCompilerProducerPorts,
 ): ScenarioCompilerResult {
+  const domains: readonly ScenarioCompilerDomain[] = [
+    'scene',
+    'timeline',
+    'camera',
+    'effect',
+    'composition',
+    'depth',
+    'audio',
+  ]
+  for (const domain of domains) {
+    if (typeof producers?.[domain]?.produce !== 'function') {
+      return missingProducerPort(domain)
+    }
+  }
+
   const sharedInput = baseProducerInput(input)
   const generationId = input.planningContext.generationId
 
@@ -155,6 +198,7 @@ export function compileScenario(
   return {
     success: true,
     output: {
+      generationId,
       scene: scene.output,
       timeline: timeline.output,
       camera: camera.output,

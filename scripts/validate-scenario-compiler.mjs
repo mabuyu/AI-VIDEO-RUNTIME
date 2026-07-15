@@ -62,7 +62,8 @@ try {
   const success = compileScenario(input, successful.ports)
   assert.equal(success.success, true)
   assert.deepEqual(successful.calls, ['scene', 'timeline', 'camera', 'effect', 'composition', 'depth', 'audio'])
-  assert.deepEqual(Object.keys(success.output), ['scene', 'timeline', 'camera', 'effect', 'depth', 'composition', 'audio'])
+  assert.deepEqual(Object.keys(success.output), ['generationId', 'scene', 'timeline', 'camera', 'effect', 'depth', 'composition', 'audio'])
+  assert.equal(success.output.generationId, generationId)
   for (const domain of Object.keys(outputs)) assert.equal(success.output[domain], outputs[domain])
 
   assert.equal(successful.producedGenerationIds.length, 7)
@@ -129,6 +130,33 @@ try {
   assert.equal(planningContextFailure.success, false)
   assert.equal('output' in planningContextFailure, false)
   assert.deepEqual(planningContextMismatch.calls, ['scene'])
+
+  const missingPort = producers()
+  delete missingPort.ports.depth
+  const missingPortFailure = compileScenario(input, missingPort.ports)
+  assert.equal(missingPortFailure.success, false)
+  assert.equal('output' in missingPortFailure, false)
+  assert.deepEqual(missingPort.calls, [])
+  assert.deepEqual(missingPortFailure.issues, [{
+    code: 'INVALID_COMPILER_INPUT',
+    message: 'depth producer port is required',
+    domain: 'depth',
+    path: 'producers.depth',
+  }])
+
+  const missingDependency = producers({
+    scene: { success: true, generationId, output: undefined },
+  })
+  const missingDependencyFailure = compileScenario(input, missingDependency.ports)
+  assert.equal(missingDependencyFailure.success, false)
+  assert.equal('output' in missingDependencyFailure, false)
+  assert.deepEqual(missingDependency.calls, ['scene'])
+  assert.deepEqual(missingDependencyFailure.issues, [{
+    code: 'INCOMPLETE_DOMAIN_OUTPUT',
+    message: 'scene producer succeeded without output',
+    domain: 'scene',
+    path: 'output',
+  }])
 
   console.log('Scenario Compiler verification passed')
 } finally {
