@@ -1,4 +1,9 @@
 export type { VideoProvider } from './videoProvider'
+export {
+  generateVideoAndWait,
+  VIDEO_GENERATION_MAX_POLLING_ATTEMPTS,
+  VIDEO_GENERATION_POLLING_INTERVAL_MS,
+} from './videoGenerationFlow'
 export { SeedanceProvider, resolveSeedanceProviderConfig } from './seedanceProvider'
 export type {
   SeedanceApiClient,

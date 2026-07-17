@@ -3,7 +3,7 @@ import { createServer } from 'vite'
 
 const server = await createServer({ appType: 'custom', logLevel: 'silent', server: { middlewareMode: true } })
 try {
-  const { SeedanceProvider } = await server.ssrLoadModule('/src/providers/video/index.ts')
+  const { SeedanceProvider, generateVideoAndWait } = await server.ssrLoadModule('/src/providers/video/index.ts')
   let providerRequest
   const taskResults = new Map([
     ['task-queued', { taskId: 'task-queued', status: 'queued', metadata: { providerTaskId: 'task-queued' } }],
@@ -64,7 +64,61 @@ try {
   const queryFailure = await provider.getGenerationStatus('missing-task')
   assert.equal(queryFailure.status, 'FAILED')
   assert.equal(queryFailure.issues[0].code, 'PROVIDER_STATUS_QUERY_FAILED')
-  console.log('Video Provider Adapter create/status smoke verification passed')
+
+  const request = {
+    generationRequestId: 'flow-request',
+    prompt: 'Generate a complete video',
+    sceneDescription: 'A complete flow smoke test',
+    cameraPlan: { description: 'Static', movements: [] },
+    timeline: { segments: [{ startSeconds: 0, endSeconds: 1, description: 'Smoke test' }] },
+    durationSeconds: 1,
+    aspectRatio: '16:9',
+    style: { description: 'test', tags: [] },
+    metadata: {},
+  }
+  const observedStatuses = []
+  const flowResults = [
+    { generationId: 'flow-task', status: 'QUEUED', videoReference: null, providerMetadata: {}, issues: [] },
+    { generationId: 'flow-task', status: 'PROCESSING', videoReference: null, providerMetadata: {}, issues: [] },
+    { generationId: 'flow-task', status: 'SUCCEEDED', videoReference: { referenceType: 'provider-video', reference: 'https://video.example/flow.mp4' }, providerMetadata: {}, issues: [] },
+  ]
+  let createCalls = 0
+  let statusCalls = 0
+  const flowProvider = {
+    providerId: 'flow-smoke',
+    async generateVideo() {
+      createCalls += 1
+      return flowResults[0]
+    },
+    async getGenerationStatus(generationId) {
+      assert.equal(generationId, 'flow-task')
+      statusCalls += 1
+      const next = flowResults[statusCalls] ?? flowResults.at(-1)
+      observedStatuses.push(next.status)
+      return next
+    },
+  }
+  const flowSucceeded = await generateVideoAndWait(flowProvider, request)
+  assert.equal(createCalls, 1)
+  assert.equal(statusCalls, 2)
+  assert.deepEqual(observedStatuses, ['PROCESSING', 'SUCCEEDED'])
+  assert.equal(flowSucceeded.generationId, 'flow-task')
+  assert.equal(flowSucceeded.status, 'SUCCEEDED')
+  assert.deepEqual(flowSucceeded.videoReference, { referenceType: 'provider-video', reference: 'https://video.example/flow.mp4' })
+
+  const failedFlow = await generateVideoAndWait({
+    providerId: 'failed-flow-smoke',
+    async generateVideo() {
+      return { generationId: 'failed-flow-task', status: 'QUEUED', videoReference: null, providerMetadata: {}, issues: [] }
+    },
+    async getGenerationStatus() {
+      return { generationId: 'failed-flow-task', status: 'FAILED', videoReference: null, providerMetadata: {}, issues: [{ code: 'MODEL_FAILED', message: 'Model failed' }] }
+    },
+  }, request)
+  assert.equal(failedFlow.status, 'FAILED')
+  assert.equal(failedFlow.videoReference, null)
+  assert.equal(failedFlow.issues[0].code, 'MODEL_FAILED')
+  console.log('Video Provider Adapter and first generation flow smoke verification passed')
 } finally {
   await server.close()
 }
