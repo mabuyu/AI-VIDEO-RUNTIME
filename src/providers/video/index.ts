@@ -1,4 +1,10 @@
 export type { VideoProvider } from './videoProvider'
+export { consumeVideoReference } from './videoReferenceConsumer'
+export type {
+  ConsumedVideoReference,
+  VideoReferenceConsumptionIssue,
+  VideoReferenceConsumptionResult,
+} from './videoReferenceConsumer'
 export {
   generateVideoAndWait,
   VIDEO_GENERATION_MAX_POLLING_ATTEMPTS,

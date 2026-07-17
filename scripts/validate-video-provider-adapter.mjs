@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict'
+import { createServer as createHttpServer } from 'node:http'
+import { readdir, stat } from 'node:fs/promises'
 import { createServer } from 'vite'
 
 const server = await createServer({ appType: 'custom', logLevel: 'silent', server: { middlewareMode: true } })
 try {
-  const { SeedanceProvider, generateVideoAndWait } = await server.ssrLoadModule('/src/providers/video/index.ts')
+  const { SeedanceProvider, consumeVideoReference, generateVideoAndWait } = await server.ssrLoadModule('/src/providers/video/index.ts')
   let providerRequest
   const taskResults = new Map([
     ['task-queued', { taskId: 'task-queued', status: 'queued', metadata: { providerTaskId: 'task-queued' } }],
@@ -118,7 +120,69 @@ try {
   assert.equal(failedFlow.status, 'FAILED')
   assert.equal(failedFlow.videoReference, null)
   assert.equal(failedFlow.issues[0].code, 'MODEL_FAILED')
-  console.log('Video Provider Adapter and first generation flow smoke verification passed')
+
+  const downloadServer = createHttpServer((request, response) => {
+    if (request.url === '/success.mp4') {
+      response.writeHead(200, { 'content-type': 'video/mp4' })
+      response.end(Buffer.from('development-mp4-smoke'))
+      return
+    }
+    if (request.url === '/invalid-content-type') {
+      response.writeHead(200, { 'content-type': 'text/plain' })
+      response.end('not a video')
+      return
+    }
+    if (request.url === '/empty.mp4') {
+      response.writeHead(200, { 'content-type': 'video/mp4' })
+      response.end()
+      return
+    }
+    response.writeHead(503, { 'content-type': 'text/plain' })
+    response.end('unavailable')
+  })
+  await new Promise((resolve) => downloadServer.listen(0, '127.0.0.1', resolve))
+  try {
+    const address = downloadServer.address()
+    assert(address && typeof address === 'object')
+    const baseUrl = `http://127.0.0.1:${address.port}`
+    const outputDirectory = new URL('../output/videos/generated/', import.meta.url)
+    const countOutputFiles = async () => {
+      try {
+        return (await readdir(outputDirectory)).filter((name) => name.endsWith('.mp4')).length
+      } catch (error) {
+        if (error && error.code === 'ENOENT') return 0
+        throw error
+      }
+    }
+    const initialFileCount = await countOutputFiles()
+
+    const consumed = await consumeVideoReference(`${baseUrl}/success.mp4`)
+    assert(!('issues' in consumed))
+    assert.equal(consumed.contentType, 'video/mp4')
+    assert(consumed.fileSize > 0)
+    assert.equal((await stat(consumed.filePath)).size, consumed.fileSize)
+
+    const downloadFailure = await consumeVideoReference(`${baseUrl}/download-failure`)
+    assert('issues' in downloadFailure)
+    assert.equal(downloadFailure.issues[0].code, 'VIDEO_DOWNLOAD_FAILED')
+
+    const invalidContentType = await consumeVideoReference(`${baseUrl}/invalid-content-type`)
+    assert('issues' in invalidContentType)
+    assert.equal(invalidContentType.issues[0].code, 'INVALID_VIDEO_CONTENT_TYPE')
+
+    const emptyFile = await consumeVideoReference(`${baseUrl}/empty.mp4`)
+    assert('issues' in emptyFile)
+    assert.equal(emptyFile.issues[0].code, 'EMPTY_VIDEO_FILE')
+
+    const invalidUrl = await consumeVideoReference('not-a-url')
+    assert('issues' in invalidUrl)
+    assert.equal(invalidUrl.issues[0].code, 'INVALID_VIDEO_REFERENCE')
+    assert.equal(await countOutputFiles(), initialFileCount + 1)
+  } finally {
+    await new Promise((resolve, reject) => downloadServer.close((error) => error ? reject(error) : resolve()))
+  }
+
+  console.log('Video Provider Adapter, generation flow, and reference consumer smoke verification passed')
 } finally {
   await server.close()
 }
