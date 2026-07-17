@@ -26,7 +26,7 @@ interface SeedanceCreateTaskRequest {
   readonly ratio: string
 }
 
-interface SeedanceCreateTaskResult {
+interface SeedanceTaskResult {
   readonly taskId: string
   readonly status: 'queued' | 'running' | 'succeeded' | 'failed'
   readonly videoUrl?: string
@@ -35,7 +35,8 @@ interface SeedanceCreateTaskResult {
 }
 
 export interface SeedanceApiClient {
-  createTask(request: SeedanceCreateTaskRequest): Promise<SeedanceCreateTaskResult>
+  createTask(request: SeedanceCreateTaskRequest): Promise<SeedanceTaskResult>
+  getTask(generationId: string): Promise<SeedanceTaskResult>
 }
 
 export type SeedanceEnvironment = Readonly<Record<string, string | undefined>>
@@ -63,6 +64,37 @@ function readString(value: unknown): string | undefined {
 }
 
 function createFetchSeedanceApiClient(config: SeedanceProviderConfig): SeedanceApiClient {
+  async function readTaskResponse(response: Response): Promise<SeedanceTaskResult> {
+    const body: unknown = await response.json().catch(() => null)
+    if (!response.ok) {
+      const error = isRecord(body) && isRecord(body.error) ? body.error : undefined
+      throw new Error(readString(error?.message) ?? `Seedance API returned HTTP ${response.status}`)
+    }
+    if (!isRecord(body)) throw new Error('Seedance API returned an invalid response')
+
+    const taskId = readString(body.id)
+    const status = readString(body.status)
+    if (!taskId || !status || !['queued', 'running', 'succeeded', 'failed'].includes(status)) {
+      throw new Error('Seedance API response is missing task identity or status')
+    }
+
+    const content = isRecord(body.content) ? body.content : undefined
+    const videoUrl = readString(content?.video_url)
+    const providerError = isRecord(body.error) ? body.error : undefined
+    return {
+      taskId,
+      status: status as SeedanceTaskResult['status'],
+      videoUrl,
+      metadata: { providerTaskId: taskId },
+      error: providerError
+        ? {
+            code: readString(providerError.code) ?? 'SEEDANCE_MODEL_FAILED',
+            message: readString(providerError.message) ?? 'Seedance generation failed',
+          }
+        : undefined,
+    }
+  }
+
   return {
     async createTask(request) {
       const response = await fetch(`${config.baseUrl ?? DEFAULT_BASE_URL}/contents/generations/tasks`, {
@@ -73,35 +105,14 @@ function createFetchSeedanceApiClient(config: SeedanceProviderConfig): SeedanceA
         },
         body: JSON.stringify(request),
       })
-
-      const body: unknown = await response.json().catch(() => null)
-      if (!response.ok) {
-        const error = isRecord(body) && isRecord(body.error) ? body.error : undefined
-        throw new Error(readString(error?.message) ?? `Seedance API returned HTTP ${response.status}`)
-      }
-      if (!isRecord(body)) throw new Error('Seedance API returned an invalid response')
-
-      const taskId = readString(body.id)
-      const status = readString(body.status)
-      if (!taskId || !status || !['queued', 'running', 'succeeded', 'failed'].includes(status)) {
-        throw new Error('Seedance API response is missing task identity or status')
-      }
-
-      const content = isRecord(body.content) ? body.content : undefined
-      const videoUrl = readString(content?.video_url)
-      const providerError = isRecord(body.error) ? body.error : undefined
-      return {
-        taskId,
-        status: status as SeedanceCreateTaskResult['status'],
-        videoUrl,
-        metadata: { providerTaskId: taskId },
-        error: providerError
-          ? {
-              code: readString(providerError.code) ?? 'SEEDANCE_MODEL_FAILED',
-              message: readString(providerError.message) ?? 'Seedance generation failed',
-            }
-          : undefined,
-      }
+      return readTaskResponse(response)
+    },
+    async getTask(generationId) {
+      const response = await fetch(`${config.baseUrl ?? DEFAULT_BASE_URL}/contents/generations/tasks/${encodeURIComponent(generationId)}`, {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${config.credentials.apiKey}` },
+      })
+      return readTaskResponse(response)
     },
   }
 }
@@ -133,7 +144,7 @@ function validateRequest(request: VideoGenerationRequest): readonly VideoGenerat
   return issues
 }
 
-function normalizeStatus(status: SeedanceCreateTaskResult['status']): VideoGenerationStatus {
+function normalizeStatus(status: SeedanceTaskResult['status']): VideoGenerationStatus {
   if (status === 'queued') return 'QUEUED'
   if (status === 'running') return 'PROCESSING'
   if (status === 'succeeded') return 'SUCCEEDED'
@@ -161,26 +172,46 @@ export class SeedanceProvider implements VideoProvider {
         duration: request.durationSeconds,
         ratio: request.aspectRatio,
       })
-      const status = normalizeStatus(response.status)
-      if (status === 'FAILED') {
-        return this.failure(response.taskId, [{
-          code: response.error?.code ?? 'PROVIDER_GENERATION_FAILED',
-          message: response.error?.message ?? 'Seedance generation failed',
-          retryable: response.error?.retryable,
-        }], response.metadata)
-      }
-      if (status === 'SUCCEEDED' && !response.videoUrl) {
-        return this.failure(response.taskId, [{ code: 'INVALID_PROVIDER_RESPONSE', message: 'Seedance succeeded without a video reference' }], response.metadata)
-      }
-      return {
-        generationId: response.taskId,
-        status,
-        videoReference: response.videoUrl ? { referenceType: 'provider-video', reference: response.videoUrl } : null,
-        providerMetadata: response.metadata ?? {},
-        issues: [],
-      }
+      return this.normalizeTask(response)
     } catch {
       return this.failure(request.generationRequestId, [{ code: 'PROVIDER_CALL_FAILED', message: 'Seedance provider call failed' }])
+    }
+  }
+
+  async getGenerationStatus(generationId: string): Promise<VideoGenerationResult> {
+    if (!generationId.trim()) {
+      return this.failure(generationId, [{ code: 'INVALID_GENERATION_ID', message: 'generationId is required', path: 'generationId' }])
+    }
+
+    try {
+      const response = await this.#client.getTask(generationId)
+      if (response.taskId !== generationId) {
+        return this.failure(generationId, [{ code: 'INVALID_PROVIDER_RESPONSE', message: 'Seedance status response identity does not match generationId' }])
+      }
+      return this.normalizeTask(response)
+    } catch {
+      return this.failure(generationId, [{ code: 'PROVIDER_STATUS_QUERY_FAILED', message: 'Seedance status query failed' }])
+    }
+  }
+
+  private normalizeTask(response: SeedanceTaskResult): VideoGenerationResult {
+    const status = normalizeStatus(response.status)
+    if (status === 'FAILED') {
+      return this.failure(response.taskId, [{
+        code: 'PROVIDER_GENERATION_FAILED',
+        message: 'Seedance generation failed',
+        retryable: response.error?.retryable,
+      }], response.metadata)
+    }
+    if (status === 'SUCCEEDED' && !response.videoUrl) {
+      return this.failure(response.taskId, [{ code: 'INVALID_PROVIDER_RESPONSE', message: 'Seedance succeeded without a video reference' }], response.metadata)
+    }
+    return {
+      generationId: response.taskId,
+      status,
+      videoReference: response.videoUrl ? { referenceType: 'provider-video', reference: response.videoUrl } : null,
+      providerMetadata: response.metadata ?? {},
+      issues: [],
     }
   }
 

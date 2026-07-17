@@ -5,11 +5,21 @@ const server = await createServer({ appType: 'custom', logLevel: 'silent', serve
 try {
   const { SeedanceProvider } = await server.ssrLoadModule('/src/providers/video/index.ts')
   let providerRequest
+  const taskResults = new Map([
+    ['task-queued', { taskId: 'task-queued', status: 'queued', metadata: { providerTaskId: 'task-queued' } }],
+    ['task-processing', { taskId: 'task-processing', status: 'running', metadata: { providerTaskId: 'task-processing' } }],
+    ['task-succeeded', { taskId: 'task-succeeded', status: 'succeeded', videoUrl: 'https://video.example/result.mp4', metadata: { providerTaskId: 'task-succeeded' } }],
+    ['task-failed', { taskId: 'task-failed', status: 'failed', metadata: { providerTaskId: 'task-failed' }, error: { code: 'MODEL_FAILED', message: 'Generation failed' } }],
+  ])
   const provider = new SeedanceProvider(
     { credentials: { apiKey: 'test-only' }, model: 'seedance-test' },
     { createTask: async (request) => {
       providerRequest = request
       return { taskId: 'task-1', status: 'queued', metadata: { providerTaskId: 'task-1' } }
+    }, getTask: async (generationId) => {
+      const task = taskResults.get(generationId)
+      if (!task) throw new Error('Task not found')
+      return task
     } },
   )
   const result = await provider.generateVideo({
@@ -36,7 +46,25 @@ try {
     providerMetadata: { providerTaskId: 'task-1' },
     issues: [],
   })
-  console.log('Video Provider Adapter smoke verification passed')
+
+  const queued = await provider.getGenerationStatus('task-queued')
+  const processing = await provider.getGenerationStatus('task-processing')
+  const succeeded = await provider.getGenerationStatus('task-succeeded')
+  const failed = await provider.getGenerationStatus('task-failed')
+  assert.equal(queued.status, 'QUEUED')
+  assert.equal(queued.videoReference, null)
+  assert.equal(processing.status, 'PROCESSING')
+  assert.equal(processing.videoReference, null)
+  assert.deepEqual(succeeded.videoReference, { referenceType: 'provider-video', reference: 'https://video.example/result.mp4' })
+  assert.equal(succeeded.status, 'SUCCEEDED')
+  assert.equal(failed.status, 'FAILED')
+  assert.equal(failed.videoReference, null)
+  assert.deepEqual(failed.issues, [{ code: 'PROVIDER_GENERATION_FAILED', message: 'Seedance generation failed', retryable: undefined }])
+
+  const queryFailure = await provider.getGenerationStatus('missing-task')
+  assert.equal(queryFailure.status, 'FAILED')
+  assert.equal(queryFailure.issues[0].code, 'PROVIDER_STATUS_QUERY_FAILED')
+  console.log('Video Provider Adapter create/status smoke verification passed')
 } finally {
   await server.close()
 }
