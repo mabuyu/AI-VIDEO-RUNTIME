@@ -22,7 +22,8 @@
     "validate:scenario-template-registry": "node scripts/validate-scenario-template-registry.mjs",
     "validate:scenario-template-selector": "node scripts/validate-scenario-template-selector.mjs",
     "validate:scenario-compiler": "node scripts/validate-scenario-compiler.mjs",
-    "validate:scenario-compiler-handoff": "node scripts/validate-scenario-compiler-handoff.mjs"
+    "validate:scenario-compiler-handoff": "node scripts/validate-scenario-compiler-handoff.mjs",
+    "validate:video-provider-adapter": "node scripts/validate-video-provider-adapter.mjs"
   },
   "dependencies": {
     "react": "^19.2.6",
