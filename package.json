@@ -23,7 +23,12 @@
     "validate:scenario-template-selector": "node scripts/validate-scenario-template-selector.mjs",
     "validate:scenario-compiler": "node scripts/validate-scenario-compiler.mjs",
     "validate:scenario-compiler-handoff": "node scripts/validate-scenario-compiler-handoff.mjs",
-    "validate:video-provider-adapter": "node scripts/validate-video-provider-adapter.mjs"
+    "validate:video-provider-adapter": "node scripts/validate-video-provider-adapter.mjs",
+    "generate:real-video": "node scripts/generate-real-video.mjs",
+    "generate:real-kling-video": "node scripts/generate-real-kling-video.mjs",
+    "generate:real-seedance-video": "node scripts/generate-real-seedance-video.mjs",
+    "generate-real-seedance-video": "node scripts/generate-real-seedance-video.mjs",
+    "probe:infistar-kling": "node scripts/probe-infistar-kling.mjs"
   },
   "dependencies": {
     "react": "^19.2.6",
