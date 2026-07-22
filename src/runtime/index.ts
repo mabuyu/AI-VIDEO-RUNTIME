@@ -5,7 +5,10 @@ export {
   createRuntimeDebugSnapshot,
   createRuntimeDebugSnapshotV2,
 } from './debug'
-export { createRuntimeServices } from './services'
+export {
+  createRuntimeArtifactConsumer,
+  createRuntimeServices,
+} from './services'
 
 export type { RuntimeApplicationOptions, RuntimeApplicationV2 } from './application'
 export type { RuntimeBootstrapResult, RuntimeBootstrapV2 } from './bootstrap'
@@ -23,4 +26,11 @@ export type {
   RuntimeDebugSnapshot,
   RuntimeDebugSnapshotV2,
 } from './debug'
-export type { RuntimeServices } from './services'
+export type {
+  RuntimeArtifactConsumer,
+  RuntimeArtifactConsumptionIssue,
+  RuntimeArtifactConsumptionResult,
+  RuntimeArtifactInput,
+  RuntimeArtifactResource,
+  RuntimeServices,
+} from './services'

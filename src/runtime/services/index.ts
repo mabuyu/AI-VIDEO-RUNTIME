@@ -1,5 +1,6 @@
 ﻿export { createRuntimeServices } from './createRuntimeServices'
 export { createRuntimeDataV2Services } from './createRuntimeDataV2Services'
+export { createRuntimeArtifactConsumer } from './artifact'
 export { createAudioService } from './audio/audioService'
 export { createCameraService } from './camera/cameraService'
 export { createCompositionService } from './composition/compositionService'
@@ -43,3 +44,13 @@ export type {
   SubtitleServiceDependencies,
   TimedRuntimeState,
 } from './types'
+
+export type {
+  RuntimeArtifactConsumer,
+  RuntimeArtifactConsumptionIssue,
+  RuntimeArtifactConsumptionIssueCode,
+  RuntimeArtifactConsumptionResult,
+  RuntimeArtifactInput,
+  RuntimeArtifactInputMetadata,
+  RuntimeArtifactResource,
+} from './artifact'
