@@ -1,7 +1,5 @@
-import {
-  validateArtifactHandoffResult,
-} from '../artifact'
 import { createActivationRequest } from './createActivationRequest'
+import { isArtifactRuntimeReference } from '../../artifacts/runtime'
 import type {
   ArtifactActivationPort,
   ProductionActivationIssue,
@@ -36,26 +34,16 @@ function failure(
   })
 }
 
-function bridgeActivationResult(candidate: unknown): unknown {
-  if (!isRecord(candidate) || candidate.ok !== true) {
-    return candidate
-  }
-
-  return Object.fromEntries(
-    Object.entries(candidate).map(([key, value]) => [
-      key === 'activationId' ? 'handoffId' : key,
-      value,
-    ]),
-  )
-}
-
 function mapInvalidResult(
   candidate: unknown,
-  expectedActivationId: string,
 ): ProductionActivationResult {
-  if (isRecord(candidate) && candidate.ok === true) {
+  if (isRecord(candidate) && typeof candidate.ok === 'boolean') {
+    const allowedKeys =
+      candidate.ok === true
+        ? ['ok', 'artifactRuntimeReference']
+        : ['ok', 'issues']
     const extraKeys = Object.keys(candidate).filter(
-      (key) => !['ok', 'activationId'].includes(key),
+      (key) => !allowedKeys.includes(key),
     )
     if (extraKeys.length > 0) {
       const forbiddenKey = extraKeys.find((key) => {
@@ -76,7 +64,7 @@ function mapInvalidResult(
           ? {
               code: 'INVALID_ACTIVATION_RESULT',
               message:
-                'Successful Artifact Activation result must contain only the matching activationId',
+                'Successful Artifact Activation result must contain only one published Runtime Reference',
             }
           : {
               code: 'FORBIDDEN_FIELD',
@@ -88,34 +76,7 @@ function mapInvalidResult(
     }
   }
 
-  const validation = validateArtifactHandoffResult(
-    bridgeActivationResult(candidate),
-    expectedActivationId,
-  )
-
-  if (!validation.valid) {
-    const forbiddenIssue = validation.issues.find(
-      (issue) => issue.code === 'FORBIDDEN_FIELD',
-    )
-    return failure([
-      forbiddenIssue === undefined
-        ? {
-            code: 'INVALID_ACTIVATION_RESULT',
-            message:
-              'Artifact Activation Port returned an invalid activation result',
-          }
-        : {
-            code: 'FORBIDDEN_FIELD',
-            message:
-              'Artifact Activation result cannot expose Artifact lifecycle or Runtime authority',
-            ...(forbiddenIssue.path === undefined
-              ? {}
-              : { path: forbiddenIssue.path }),
-          },
-    ])
-  }
-
-  if (!isRecord(candidate)) {
+  if (!isRecord(candidate) || typeof candidate.ok !== 'boolean') {
     return failure([
       {
         code: 'INVALID_ACTIVATION_RESULT',
@@ -126,10 +87,49 @@ function mapInvalidResult(
   }
 
   if (candidate.ok === true) {
+    if (
+      Object.keys(candidate).length !== 2 ||
+      !isArtifactRuntimeReference(candidate.artifactRuntimeReference)
+    ) {
+      return failure([
+        {
+          code: 'INVALID_ACTIVATION_RESULT',
+          message:
+            'Artifact Activation Port did not return an immutable published Runtime Reference',
+        },
+      ])
+    }
+
+    const accepted = candidate as Extract<
+      ProductionActivationResult,
+      { readonly ok: true }
+    >
     return Object.freeze({
       ok: true,
-      activationId: expectedActivationId,
+      artifactRuntimeReference: accepted.artifactRuntimeReference,
     })
+  }
+
+  if (
+    Object.keys(candidate).length !== 2 ||
+    !Array.isArray(candidate.issues) ||
+    candidate.issues.length === 0 ||
+    candidate.issues.some(
+      (issue) =>
+        !isRecord(issue) ||
+        typeof issue.code !== 'string' ||
+        !issue.code.trim() ||
+        typeof issue.message !== 'string' ||
+        !issue.message.trim(),
+    )
+  ) {
+    return failure([
+      {
+        code: 'INVALID_ACTIVATION_RESULT',
+        message:
+          'Artifact Activation Port returned an invalid activation result',
+      },
+    ])
   }
 
   const issues = candidate.issues as readonly ProductionActivationIssue[]
@@ -163,7 +163,7 @@ export class ProductionActivationService {
       ])
     }
 
-    return mapInvalidResult(portResult, creation.request.activationId)
+    return mapInvalidResult(portResult)
   }
 }
 

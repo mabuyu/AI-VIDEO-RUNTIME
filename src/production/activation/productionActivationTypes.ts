@@ -1,5 +1,6 @@
 import type { ProductionAttempt } from '../types/productionAttempt'
 import type { VideoReference } from '../provider'
+import type { ArtifactRuntimeReference } from '../../artifacts/runtime'
 
 export interface ProductionActivationRequest {
   readonly activationId: string
@@ -33,7 +34,7 @@ export type ProductionActivationRequestCreationResult =
 export type ProductionActivationResult =
   | {
       readonly ok: true
-      readonly activationId: string
+      readonly artifactRuntimeReference: ArtifactRuntimeReference
     }
   | {
       readonly ok: false

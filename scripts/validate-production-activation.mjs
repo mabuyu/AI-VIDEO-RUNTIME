@@ -27,6 +27,19 @@ const videoReference = Object.freeze({
   }),
 })
 
+const artifactRuntimeReference = Object.freeze({
+  artifactId: 'artifact-activation-001',
+  artifactType: 'video',
+  location: Object.freeze({
+    type: 'local-file',
+    path: 'output/artifacts/videos/artifact-activation-001.mp4',
+  }),
+  metadata: Object.freeze({
+    mimeType: 'video/mp4',
+    size: 1024,
+  }),
+})
+
 function createInput(overrides = {}) {
   return {
     activationId: 'activation-001',
@@ -107,7 +120,7 @@ try {
       receivedRequest = request
       return {
         ok: true,
-        activationId: request.activationId,
+        artifactRuntimeReference,
       }
     },
   })
@@ -124,17 +137,25 @@ try {
   assert.equal(Object.isFrozen(receivedRequest), true)
   assert.deepEqual(accepted, {
     ok: true,
-    activationId: 'activation-001',
+    artifactRuntimeReference,
   })
-  assert.deepEqual(Object.keys(accepted), ['ok', 'activationId'])
+  assert.deepEqual(
+    Object.keys(accepted),
+    ['ok', 'artifactRuntimeReference'],
+  )
   assert.equal(Object.isFrozen(accepted), true)
+  assert.equal(
+    accepted.artifactRuntimeReference,
+    artifactRuntimeReference,
+    'Production must pass through the Artifact-owned Runtime Reference',
+  )
 
   for (const status of ['CREATED', 'RUNNING', 'FAILED']) {
     let invalidPortCalled = false
     const invalidService = createProductionActivationService({
       async activate() {
         invalidPortCalled = true
-        return { ok: true, activationId: 'must-not-exist' }
+        return { ok: true, artifactRuntimeReference }
       },
     })
     const result = await invalidService.activate(
@@ -157,7 +178,7 @@ try {
   const invalidReference = await createProductionActivationService({
     async activate() {
       invalidReferencePortCalled = true
-      return { ok: true, activationId: 'must-not-exist' }
+      return { ok: true, artifactRuntimeReference }
     },
   }).activate(
     createInput({
@@ -231,18 +252,17 @@ try {
     async activate() {
       return {
         ok: true,
-        activationId: 'activation-001',
+        artifactRuntimeReference,
         READY: true,
       }
     },
   }).activate(createInput())
   assertFailure(readyLeakage, 'FORBIDDEN_FIELD', 'READY result leakage')
 
-  const runtimeLeakage = await createProductionActivationService({
+  const mutableReference = await createProductionActivationService({
     async activate() {
       return {
         ok: true,
-        activationId: 'activation-001',
         artifactRuntimeReference: {
           artifactId: 'artifact-001',
         },
@@ -250,38 +270,55 @@ try {
     },
   }).activate(createInput())
   assertFailure(
-    runtimeLeakage,
+    mutableReference,
+    'INVALID_ACTIVATION_RESULT',
+    'Mutable Runtime reference rejection',
+  )
+
+  const partialReference = await createProductionActivationService({
+    async activate() {
+      return {
+        ok: true,
+        artifactRuntimeReference: Object.freeze({
+          artifactId: 'artifact-partial',
+        }),
+      }
+    },
+  }).activate(createInput())
+  assertFailure(
+    partialReference,
+    'INVALID_ACTIVATION_RESULT',
+    'Partial Runtime reference rejection',
+  )
+
+  const missingReference = await createProductionActivationService({
+    async activate() {
+      return {
+        ok: true,
+      }
+    },
+  }).activate(createInput())
+  assertFailure(
+    missingReference,
+    'INVALID_ACTIVATION_RESULT',
+    'Missing Runtime reference',
+  )
+
+  const duplicateResultAuthority = await createProductionActivationService({
+    async activate() {
+      return {
+        ok: true,
+        artifactRuntimeReference,
+        artifactEnvelope: {
+          status: 'READY',
+        },
+      }
+    },
+  }).activate(createInput())
+  assertFailure(
+    duplicateResultAuthority,
     'FORBIDDEN_FIELD',
-    'Runtime reference leakage',
-  )
-
-  const mismatchedIdentity = await createProductionActivationService({
-    async activate() {
-      return {
-        ok: true,
-        activationId: 'activation-other',
-      }
-    },
-  }).activate(createInput())
-  assertFailure(
-    mismatchedIdentity,
-    'INVALID_ACTIVATION_RESULT',
-    'Mismatched activation identity',
-  )
-
-  const duplicateIdentity = await createProductionActivationService({
-    async activate() {
-      return {
-        ok: true,
-        activationId: 'activation-other',
-        handoffId: 'activation-001',
-      }
-    },
-  }).activate(createInput())
-  assertFailure(
-    duplicateIdentity,
-    'INVALID_ACTIVATION_RESULT',
-    'Duplicate activation identity',
+    'Artifact Envelope result leakage',
   )
 
   const thrownPort = await createProductionActivationService({
@@ -301,7 +338,7 @@ try {
   console.log('invalidAttemptRejection = PASS')
   console.log('artifactLeakage = ABSENT')
   console.log('readyLeakage = ABSENT')
-  console.log('runtimeLeakage = ABSENT')
+  console.log('runtimeReferencePublication = PASS')
   console.log('failureFailClosed = PASS')
 } finally {
   await server.close()
