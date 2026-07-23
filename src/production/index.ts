@@ -1,3 +1,17 @@
+export {
+  createArtifactHandoffRequest,
+  submitArtifactHandoff,
+  validateArtifactHandoffResult,
+  validateProductionArtifactHandoffRequest,
+} from './artifact'
+export type {
+  ArtifactConsumer,
+  ArtifactHandoffIssue,
+  ArtifactHandoffResult,
+  ArtifactHandoffValidationResult,
+  ProductionArtifactHandoffRequest,
+  ProductionArtifactHandoffRequestCreationResult,
+} from './artifact'
 export { createProductionAttempt } from './factory/createProductionAttempt'
 export type { CreateProductionAttemptInput } from './factory/createProductionAttempt'
 export { createProductionJob } from './factory/createProductionJob'
