@@ -1,3 +1,5 @@
+import type { ProductionAttemptSummary } from './productionAttempt'
+
 export type ProductionJobStatus =
   | 'CREATED'
   | 'SCHEDULED'
@@ -5,7 +7,7 @@ export type ProductionJobStatus =
   | 'COMPLETED'
   | 'FAILED'
 
-export type ProductionJobAttemptsSummary = readonly never[]
+export type ProductionJobAttemptsSummary = readonly ProductionAttemptSummary[]
 
 export interface ProductionJob {
   readonly jobId: string
