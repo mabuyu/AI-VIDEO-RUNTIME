@@ -1,4 +1,17 @@
 export {
+  createActivationRequest,
+  createProductionActivationService,
+  ProductionActivationService,
+} from './activation'
+export type {
+  ArtifactActivationPort,
+  ProductionActivationIssue,
+  ProductionActivationRequest,
+  ProductionActivationRequestCreationResult,
+  ProductionActivationRequestInput,
+  ProductionActivationResult,
+} from './activation'
+export {
   createArtifactIngestionAdapter,
   createArtifactHandoffRequest,
   submitArtifactHandoff,
