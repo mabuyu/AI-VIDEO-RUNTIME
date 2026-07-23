@@ -1,3 +1,7 @@
+export {
+  createArtifactIngestionAdapter,
+  type ProductionArtifactIngestionAdapter,
+} from './adapter/createArtifactIngestionAdapter'
 export { submitArtifactHandoff } from './adapter/submitArtifactHandoff'
 export { createArtifactHandoffRequest } from './factory/createArtifactHandoffRequest'
 export type {

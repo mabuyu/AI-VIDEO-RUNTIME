@@ -29,6 +29,7 @@
     "validate-production-attempt": "node scripts/validate-production-attempt.mjs",
     "validate-provider-execution-boundary": "node scripts/validate-provider-execution-boundary.mjs",
     "validate-production-artifact-handoff": "node scripts/validate-production-artifact-handoff.mjs",
+    "validate-artifact-ingestion-integration": "node scripts/validate-artifact-ingestion-integration.mjs",
     "generate:real-video": "node scripts/generate-real-video.mjs",
     "generate:real-kling-video": "node scripts/generate-real-kling-video.mjs",
     "generate:real-seedance-video": "node scripts/generate-real-seedance-video.mjs",

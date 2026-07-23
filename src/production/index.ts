@@ -1,10 +1,12 @@
 export {
+  createArtifactIngestionAdapter,
   createArtifactHandoffRequest,
   submitArtifactHandoff,
   validateArtifactHandoffResult,
   validateProductionArtifactHandoffRequest,
 } from './artifact'
 export type {
+  ProductionArtifactIngestionAdapter,
   ArtifactConsumer,
   ArtifactHandoffIssue,
   ArtifactHandoffResult,
