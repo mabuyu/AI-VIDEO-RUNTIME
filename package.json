@@ -27,6 +27,7 @@
     "validate:runtime-artifact-consumption": "node scripts/validate-runtime-artifact-consumption.mjs",
     "validate-production-job": "node scripts/validate-production-job.mjs",
     "validate-production-attempt": "node scripts/validate-production-attempt.mjs",
+    "validate-provider-execution-boundary": "node scripts/validate-provider-execution-boundary.mjs",
     "generate:real-video": "node scripts/generate-real-video.mjs",
     "generate:real-kling-video": "node scripts/generate-real-kling-video.mjs",
     "generate:real-seedance-video": "node scripts/generate-real-seedance-video.mjs",

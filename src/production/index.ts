@@ -2,6 +2,27 @@ export { createProductionAttempt } from './factory/createProductionAttempt'
 export type { CreateProductionAttemptInput } from './factory/createProductionAttempt'
 export { createProductionJob } from './factory/createProductionJob'
 export type { CreateProductionJobInput } from './factory/createProductionJob'
+export {
+  createProviderExecution,
+  isGenerationRequest,
+  isProviderExecutionResult,
+  isVideoReference,
+  validateGenerationRequest,
+  validateProviderExecution,
+  validateVideoReference,
+} from './provider'
+export type {
+  CreateProviderExecutionInput,
+  GenerationOutputSpecification,
+  GenerationRequest,
+  ProviderExecutionIssue,
+  ProviderExecutionResult,
+  ProviderExecutionValidationResult,
+  ProviderMetadataPrimitive,
+  ProviderMetadataValue,
+  VideoProvider,
+  VideoReference,
+} from './provider'
 export { transitionProductionAttempt } from './state/productionAttemptState'
 export { transitionProductionJob } from './state/productionJobState'
 export type {
