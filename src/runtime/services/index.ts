@@ -3,6 +3,7 @@ export { createRuntimeDataV2Services } from './createRuntimeDataV2Services'
 export {
   createRuntimeArtifactConsumer,
   createRuntimeArtifactConsumptionAdapter,
+  createRuntimeArtifactService,
 } from './artifact'
 export { createAudioService } from './audio/audioService'
 export { createCameraService } from './camera/cameraService'
@@ -57,4 +58,5 @@ export type {
   RuntimeArtifactInput,
   RuntimeArtifactInputMetadata,
   RuntimeArtifactResource,
+  RuntimeArtifactService,
 } from './artifact'

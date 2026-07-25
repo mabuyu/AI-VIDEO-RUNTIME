@@ -19,6 +19,10 @@
   SubtitleReader,
   TimelineReader,
 } from '../../runtimeData'
+import type {
+  RuntimeArtifactConsumptionAdapter,
+  RuntimeArtifactService,
+} from './artifact'
 
 export type SceneLifecycleState = 'enter' | 'active' | 'exit' | 'inactive'
 
@@ -83,6 +87,7 @@ export interface RuntimeServices {
   readonly scene: SceneService
   readonly subtitle: SubtitleService
   readonly camera: CameraService
+  readonly artifact: RuntimeArtifactService
 }
 
 export interface TimedRuntimeState<T> {
@@ -129,6 +134,7 @@ export interface RuntimeDataV2Services extends RuntimeServices {
 
 export interface RuntimeServiceDependencies {
   readonly readers: RuntimeReaders
+  readonly artifactConsumptionAdapter?: RuntimeArtifactConsumptionAdapter
 }
 
 export interface PlaybackServiceDependencies {

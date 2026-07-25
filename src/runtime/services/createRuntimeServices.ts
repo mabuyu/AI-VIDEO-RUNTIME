@@ -1,4 +1,8 @@
 ﻿import type { RuntimeReaders } from '../../runtimeData'
+import {
+  createRuntimeArtifactService,
+  type RuntimeArtifactConsumptionAdapter,
+} from './artifact'
 import { createCameraService } from './camera/cameraService'
 import { createPlaybackService } from './playback/playbackService'
 import { createProjectService } from './project/projectService'
@@ -8,6 +12,7 @@ import type { RuntimeServices } from './types'
 
 export function createRuntimeServices(
   readers: RuntimeReaders,
+  artifactConsumptionAdapter?: RuntimeArtifactConsumptionAdapter,
 ): RuntimeServices {
   return {
     project: createProjectService({
@@ -25,5 +30,9 @@ export function createRuntimeServices(
     camera: createCameraService({
       cameraReader: readers.camera,
     }),
+    artifact:
+      artifactConsumptionAdapter === undefined
+        ? createRuntimeArtifactService()
+        : createRuntimeArtifactService(artifactConsumptionAdapter),
   }
 }

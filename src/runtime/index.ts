@@ -8,6 +8,7 @@ export {
 export {
   createRuntimeArtifactConsumer,
   createRuntimeArtifactConsumptionAdapter,
+  createRuntimeArtifactService,
   createRuntimeServices,
 } from './services'
 
@@ -34,5 +35,6 @@ export type {
   RuntimeArtifactConsumptionResult,
   RuntimeArtifactInput,
   RuntimeArtifactResource,
+  RuntimeArtifactService,
   RuntimeServices,
 } from './services'
