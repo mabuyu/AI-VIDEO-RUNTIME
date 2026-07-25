@@ -25,6 +25,7 @@
     "validate:scenario-compiler-handoff": "node scripts/validate-scenario-compiler-handoff.mjs",
     "validate:video-provider-adapter": "node scripts/validate-video-provider-adapter.mjs",
     "validate:runtime-artifact-consumption": "node scripts/validate-runtime-artifact-consumption.mjs",
+    "validate:runtime-consumption-adapter": "node scripts/validate-runtime-consumption-adapter.mjs",
     "validate-production-job": "node scripts/validate-production-job.mjs",
     "validate-production-attempt": "node scripts/validate-production-attempt.mjs",
     "validate-provider-execution-boundary": "node scripts/validate-provider-execution-boundary.mjs",

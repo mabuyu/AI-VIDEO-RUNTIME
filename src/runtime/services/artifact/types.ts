@@ -60,3 +60,9 @@ export interface RuntimeArtifactConsumer {
     reference: ArtifactRuntimeReference,
   ): Promise<RuntimeArtifactConsumptionResult>
 }
+
+export interface RuntimeArtifactConsumptionAdapter {
+  consume(
+    reference: ArtifactRuntimeReference,
+  ): Promise<RuntimeArtifactConsumptionResult>
+}

@@ -7,6 +7,7 @@ export {
 } from './debug'
 export {
   createRuntimeArtifactConsumer,
+  createRuntimeArtifactConsumptionAdapter,
   createRuntimeServices,
 } from './services'
 
@@ -28,6 +29,7 @@ export type {
 } from './debug'
 export type {
   RuntimeArtifactConsumer,
+  RuntimeArtifactConsumptionAdapter,
   RuntimeArtifactConsumptionIssue,
   RuntimeArtifactConsumptionResult,
   RuntimeArtifactInput,
