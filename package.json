@@ -37,6 +37,7 @@
     "validate-production-activation": "node scripts/validate-production-activation.mjs",
     "validate-production-closed-loop": "node scripts/validate-production-closed-loop.mjs",
     "validate-production-runtime-e2e": "node scripts/validate-production-runtime-e2e.mjs",
+    "validate-production-runtime-scenario": "node scripts/validate-production-runtime-scenario.mjs",
     "generate:real-video": "node scripts/generate-real-video.mjs",
     "generate:real-kling-video": "node scripts/generate-real-kling-video.mjs",
     "generate:real-seedance-video": "node scripts/generate-real-seedance-video.mjs",
