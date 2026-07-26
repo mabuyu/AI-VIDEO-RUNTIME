@@ -27,6 +27,7 @@
     "validate:runtime-artifact-consumption": "node scripts/validate-runtime-artifact-consumption.mjs",
     "validate:runtime-consumption-adapter": "node scripts/validate-runtime-consumption-adapter.mjs",
     "validate-runtime-services-artifact-consumption": "node scripts/validate-runtime-services-artifact-consumption.mjs",
+    "validate-runtime-consumption-completion": "node scripts/validate-runtime-consumption-completion.mjs",
     "validate-production-job": "node scripts/validate-production-job.mjs",
     "validate-production-attempt": "node scripts/validate-production-attempt.mjs",
     "validate-provider-execution-boundary": "node scripts/validate-provider-execution-boundary.mjs",

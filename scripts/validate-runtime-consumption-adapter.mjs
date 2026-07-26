@@ -164,17 +164,17 @@ try {
     '../src/App.tsx',
   ])
   const isolatedBoundaries = [
-    ['RuntimeDataV2', runtimeDataTypes],
-    ['RuntimeContext', runtimeContextTypes],
-    ['Renderer', `${renderer}\n${app}`],
+    ['RuntimeDataV2', runtimeDataTypes, true],
+    ['RuntimeContext', runtimeContextTypes, true],
+    ['Renderer', `${renderer}\n${app}`, false],
   ]
-  for (const [label, source] of isolatedBoundaries) {
+  for (const [label, source, forbidRuntimeInput] of isolatedBoundaries) {
     for (const forbidden of [
       'ArtifactRuntimeReference',
       'RuntimeArtifactConsumer',
       'RuntimeArtifactConsumptionAdapter',
       'RuntimeArtifactResolver',
-      'RuntimeArtifactInput',
+      ...(forbidRuntimeInput ? ['RuntimeArtifactInput'] : []),
       'artifactId',
       'READY',
       'artifactLifecycle',

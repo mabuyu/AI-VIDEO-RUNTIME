@@ -1,7 +1,11 @@
 import type { RuntimeDataSourceKind, RuntimeValidationIssue } from '../../runtimeData'
 import type { RuntimeDataV2Readers } from '../../runtimeData'
 import type { RuntimeBootstrapV2 } from '../bootstrap'
-import type { RuntimeDataV2Services, RuntimeServices } from '../services'
+import type {
+  RuntimeArtifactService,
+  RuntimeDataV2Services,
+  RuntimeServices,
+} from '../services'
 
 export interface RuntimeContext {
   readonly sourceKind: RuntimeDataSourceKind
@@ -31,6 +35,7 @@ export interface RuntimeContextV2 {
   readonly readiness: {
     readonly ready: true
   }
+  readonly artifact: RuntimeArtifactService
   readonly services: RuntimeDataV2Services
   readonly state: RuntimeStateV2
   readonly diagnostics: RuntimeDiagnosticsV2

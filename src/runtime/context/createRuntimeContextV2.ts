@@ -12,6 +12,7 @@ export function createRuntimeContextV2({
     readiness: {
       ready: bootstrap.ready,
     },
+    artifact: services.artifact,
     services,
     state: {
       status: 'ready',
