@@ -4,6 +4,7 @@ export type {
   ArtifactMetadata,
   ArtifactSource,
 } from './artifactEnvelope'
+export type { ArtifactCreationBoundary } from './artifactCreationBoundary'
 export type {
   ArtifactLocationType,
   ArtifactStatus,
@@ -18,3 +19,7 @@ export {
   validateArtifactEnvelope,
   type ArtifactEnvelopeValidationResult,
 } from './validateArtifactEnvelope'
+export type {
+  GenerationOutput,
+  GenerationOutputMetadata,
+} from './generationOutput'

@@ -4,6 +4,18 @@ export {
   ProductionActivationService,
 } from './activation'
 export type {
+  GenerationIssue,
+  GenerationOutput,
+  GenerationResult,
+  GenerationStatus,
+  GenerationTask,
+  ProductionOutputSpecification,
+  ProductionPlan,
+  ProductionRequest,
+  ProductionValidationIssue,
+  ProductionValidationResult,
+} from './contracts'
+export type {
   ArtifactActivationPort,
   ProductionActivationIssue,
   ProductionActivationRequest,
@@ -76,3 +88,13 @@ export type {
 } from './types/productionJob'
 export { validateProductionAttemptTransition } from './validation/validateProductionAttemptTransition'
 export { validateProductionJobTransition } from './validation/validateProductionJobTransition'
+export {
+  isGenerationResult,
+  isGenerationTask,
+  isProductionPlan,
+  isProductionRequest,
+  validateGenerationResult,
+  validateGenerationTask,
+  validateProductionPlan,
+  validateProductionRequest,
+} from './validation'

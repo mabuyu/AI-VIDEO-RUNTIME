@@ -47,6 +47,7 @@
     "validate-customer-demo-experience": "node scripts/validate-customer-demo-experience.mjs",
     "validate-monetization-foundation": "node scripts/validate-monetization-foundation.mjs",
     "validate-production-adapter": "node scripts/validate-production-adapter.mjs",
+    "validate-generation-result-integration": "node scripts/validate-generation-result-integration.mjs",
     "validate-stage3-architecture-closure": "node scripts/validate-stage3-architecture-closure.mjs",
     "validate-stage3-commercial-flow": "node scripts/validate-stage3-commercial-flow.mjs",
     "generate:real-video": "node scripts/generate-real-video.mjs",
