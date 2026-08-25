@@ -1,5 +1,6 @@
 export { createArtifactRuntimeReference } from './createArtifactRuntimeReference'
 export { createArtifactRuntimePublicationAdapter } from './artifactRuntimePublicationAdapter'
+export { createArtifactRuntimePublicationBoundary } from './productionArtifactRuntimePublication'
 export { isArtifactRuntimeReference } from './validateArtifactRuntimeReference'
 export type {
   ArtifactRuntimePublicationIssue,
@@ -11,3 +12,10 @@ export type {
   ArtifactRuntimeMetadata,
   ArtifactRuntimeReference,
 } from './artifactRuntimeReference'
+export type {
+  ArtifactRuntimePublicationBoundary,
+  ProductionArtifactRuntimePublicationIssue,
+  ProductionArtifactRuntimePublicationIssueCode,
+  ProductionArtifactRuntimePublicationResult,
+  ProductionArtifactRuntimeReference,
+} from './productionArtifactRuntimePublication'
